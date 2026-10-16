@@ -1,7 +1,6 @@
 import pygame
 from defining import *
 
-
 pygame.display.init()
 pygame.font.init()
 running = True
@@ -14,21 +13,13 @@ windowone = pygame.window.Window(title="Small Test", size=(SCREEN_WIDTH, SCREEN_
 screen = windowone.get_surface()
 
 
-
-
 # =============== ENTITIES or just all things drawn =============== #
 info_text = make_text("Good morning!", (SCREEN_WIDTH // 2), 20)
-button = make_rect(0, 0, 100, 50, "Click me!")
-button["rect"].center = screen.get_rect().center
-button["text center"].center = screen.get_rect().center
-player = Player("p1", 175, 175, 50, 50)
-
-
+buttonone = Button("center", "center", 100, 50, "clickington", screen)
+player = Player(175, 175, 50, 50)
 
 
 gamestate = 0
-
-
 
 
 # =============== RUNNING =============== #
@@ -61,15 +52,11 @@ while running:
 
 
    movements(player.rect)
-   pygame.draw.rect(screen, (0, 175, 0), button["rect"], 0) # drawing green buttons
-   screen.blit(button["text"], button["text center"]) # blitting button text
+   pygame.draw.rect(screen, (0, 175, 0), buttonone.rect, 0) # drawing green buttons
+   screen.blit(buttonone.text, buttonone.centertext) # blitting button text
    pygame.draw.rect(screen, (255, 0, 0), player.rect) # drawing red player
    windowone.flip() # always updating
    clock.tick(60) # fps
-
-
-
-
 
 
 
