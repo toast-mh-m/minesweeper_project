@@ -1,0 +1,65 @@
+import pygame
+
+
+pygame.init() # initialization
+font = pygame.font.SysFont("Times New Roman", 20)
+WHITE = (255, 255, 255)
+
+
+def movements(player):
+    player_speed = 10
+    player_speed_diag = player_speed * 0.707
+    key_w, key_a, key_s, key_d = pygame.K_w, pygame.K_a, pygame.K_s, pygame.K_d
+    # movement
+    key = pygame.key.get_pressed()
+
+
+    if key[key_a] and key[key_w] == True:
+        player.move_ip(-player_speed_diag, -player_speed_diag)
+    elif key[key_d] and key[key_w] == True:
+       player.move_ip(player_speed_diag, -player_speed_diag)
+    elif key[key_a] and key[key_s] == True:
+       player.move_ip(-player_speed_diag, player_speed_diag)
+    elif key[key_d] and key[key_s] == True:
+       player.move_ip(player_speed_diag, player_speed_diag)
+    elif key[key_a] == True:
+       player.move_ip(-player_speed, 0)
+    elif key[key_d] == True:
+       player.move_ip(player_speed, 0)
+    elif key[key_w] ==  True:
+       player.move_ip(0, -player_speed)
+    elif key[key_s] == True:
+       player.move_ip(0, player_speed)
+
+
+    if key[pygame.K_1] == True:
+       print(pygame.mouse.get_pos())
+
+
+def make_rect(x, y, width, height, text):
+    temp_rect = pygame.Rect((x, y, width, height))
+    if not text == "":
+        temp_text = font.render(text, True, WHITE)
+        temp_text_rect = temp_text.get_rect(center=(temp_rect.center))
+    else:
+       temp_text = None
+       temp_text_rect = None
+    return {
+            "rect" : temp_rect,
+            "text" : temp_text,
+            "text center" : temp_text_rect
+    }
+
+
+def make_text(text, x, y):
+    temp_text = font.render(text, True, WHITE)
+    temp_text_rect = temp_text.get_rect(center=(x, y))
+    return {
+            "text" : temp_text,
+            "text rect" : temp_text_rect
+    }
+
+
+def fontrendering(text):
+   return font.render(text, True, WHITE)
+
