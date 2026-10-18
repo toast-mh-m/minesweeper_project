@@ -34,20 +34,6 @@ def movements(player):
    if key[pygame.K_1] == True:
       print(pygame.mouse.get_pos())
 
-def make_rect(x, y, width, height, text):
-   temp_rect = pygame.Rect((x, y, width, height))
-   if not text == "":
-       temp_text = font.render(text, True, WHITE)
-       temp_text_rect = temp_text.get_rect(center=(temp_rect.center))
-   else:
-      temp_text = None
-      temp_text_rect = None
-   return {
-           "rect" : temp_rect,
-           "text" : temp_text,
-           "text center" : temp_text_rect
-   }
-
 class Player:
    def __init__(self, x, y, width, height):
       self.x = x
@@ -63,22 +49,44 @@ class Button:
       self.width = width
       self.height = height
       self.text = font.render(text, True, WHITE)
-      if isinstance(x, int) and isinstance(y, int):
-         self.rect = pygame.Rect((x, y, width, height))
-      elif (x and y == "center"):
-         self.rect = pygame.Rect((0, 0, width, height))
-         self.rect.center = screen.get_rect().center
-      self.centertext = self.text.get_rect(center=(self.rect.center))
+      
+      screen_w, screen_h = screen.get_size()
+      self.rect = pygame.Rect((0, 0, width, height))
+      match (x, y):
+         case "center", int() as y_value:
+            target_center = (screen_w // 2, y_value)
 
+         case int() as x_value, "center":
+            target_center = (x_value, screen_h // 2)
 
+         case "center", "center":
+            target_center = (screen_w // 2, screen_h // 2)
 
-def make_text(text, x, y):
-   temp_text = font.render(text, True, WHITE)
-   temp_text_rect = temp_text.get_rect(center=(x, y))
-   return {
-           "text" : temp_text,
-           "text rect" : temp_text_rect
-   }
+         case int() as x_value, int() as y_value:
+            target_center = (x_value, y_value)
+            
+      self.rect.center = target_center
+      self.location = self.text.get_rect(center=target_center)
+      
+
+class Text:
+   def __init__(self, text, x, y, color, screen):
+      self.text = font.render(text, True, color)
+      self.x = x
+      self.y = y
+      tl, tr = screen.get_size()
+      match (x, y):
+         case "center", int() as y:
+            self.location = self.text.get_rect(center=(tl // 2, y))
+
+         case int() as x, "center":
+            self.location = self.text.get_rect(center=(x, tr // 2))
+
+         case "center", "center":
+            self.location = self.text.get_rect(center=(tl // 2, tr // 2))
+
+         case int() as x, int() as y:
+            self.location = self.text.get_rect(center=(x, y))
 
 def fontrendering(text):
   return font.render(text, True, WHITE)
