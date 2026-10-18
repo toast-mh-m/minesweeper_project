@@ -1,10 +1,23 @@
 import pygame
+import os
 from defining import *
 
 pygame.display.init()
 pygame.font.init()
 running = True
 clock = pygame.time.Clock()
+username = "test"
+
+with open("user\\config.txt") as f:
+    contents = f.read()
+    if username in contents:
+        print(f"found {username}")
+    else:
+        print(f"did not find ")
+
+
+# configtxt = open("user\\test.txt", "x") # ADDING NEW TXT FILES
+# os.remove("user\\test.txt") # REMOVING TXT FILES
 
 
 # =============== WINDOW =============== #
@@ -37,10 +50,6 @@ while running:
 
    # =============== EVENT HANDLER =============== #
    for event in pygame.event.get():
-       if event.type == pygame.WINDOWCLOSE:
-           event.window.destroy()
-
-
        if event.type == pygame.QUIT: # allows quitting of the window
           running = False
 
