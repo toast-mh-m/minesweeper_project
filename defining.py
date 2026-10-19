@@ -1,10 +1,9 @@
 import pygame
 
-
 pygame.display.init() # initialization
 pygame.font.init()
-font = pygame.font.SysFont("Times New Roman", 20)
 WHITE = (255, 255, 255)
+BLACK = (0, 0, 0)
 
 
 def movements(player):
@@ -43,12 +42,15 @@ class Player:
       self.rect = pygame.Rect((x, y, width, height))
 
 class Button:
-   def __init__(self, x, y, width, height, text, screen):
+   def __init__(self, x, y, width, height, text, font_size, font_color, screen, color):
       self.x = x
       self.y = y
       self.width = width
       self.height = height
-      self.text = font.render(text, True, WHITE)
+      self.font_color = font_color
+      font = pygame.font.SysFont("Times New Roman", font_size)
+      self.text = font.render(text, True, font_color)
+      self.color = color
       
       screen_w, screen_h = screen.get_size()
       self.rect = pygame.Rect((0, 0, width, height))
@@ -67,10 +69,10 @@ class Button:
             
       self.rect.center = target_center
       self.location = self.text.get_rect(center=target_center)
-      
 
 class Text:
-   def __init__(self, text, x, y, color, screen):
+   def __init__(self, text, font_size, x, y, color, screen):
+      font = pygame.font.SysFont("Times New Roman", font_size)
       self.text = font.render(text, True, color)
       self.x = x
       self.y = y
@@ -88,5 +90,6 @@ class Text:
          case int() as x, int() as y:
             self.location = self.text.get_rect(center=(x, y))
 
-def fontrendering(text):
+def fontrendering(text, font_size):
+  font = pygame.font.SysFont("Times New Roman", font_size)
   return font.render(text, True, WHITE)
