@@ -1,2 +1,3 @@
 .venv/
 user/config.txt
+__pycache__/
