@@ -42,12 +42,13 @@ class Player:
       self.rect = pygame.Rect((x, y, width, height))
 
 class Button:
-   def __init__(self, x, y, width, height, text, font_size, font_color, screen, color):
+   def __init__(self, x, y, width, height, base_text, text, font_size, font_color, screen, color):
       self.x = x
       self.y = y
       self.width = width
       self.height = height
       self.font_color = font_color
+      self.base_text = base_text
       font = pygame.font.SysFont("Times New Roman", font_size)
       self.text = font.render(text, True, font_color)
       self.color = color
@@ -90,6 +91,6 @@ class Text:
          case int() as x, int() as y:
             self.location = self.text.get_rect(center=(x, y))
 
-def fontrendering(text, font_size):
+def fontrendering(text, font_size, color):
   font = pygame.font.SysFont("Times New Roman", font_size)
-  return font.render(text, True, WHITE)
+  return font.render(text, True, color)
