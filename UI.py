@@ -1,6 +1,7 @@
 import pygame
 
-pygame.display.init() # initialization
+### initialization ###
+pygame.display.init()
 pygame.font.init()
 WHITE = (255, 255, 255)
 BLACK = (0, 0, 0)
@@ -42,7 +43,7 @@ class Player:
       self.rect = pygame.Rect((x, y, width, height))
 
 class Button:
-   def __init__(self, x, y, width, height, base_text, text, font_size, font_color, screen, color):
+   def __init__(self, x, y, width, height, base_text, text, font_size, font_color, screen, color, interactable):
       self.x = x
       self.y = y
       self.width = width
@@ -52,6 +53,7 @@ class Button:
       font = pygame.font.SysFont("Times New Roman", font_size)
       self.text = font.render(text, True, font_color)
       self.color = color
+      self.interactable = interactable
       
       screen_w, screen_h = screen.get_size()
       self.rect = pygame.Rect((0, 0, width, height))
