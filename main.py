@@ -95,7 +95,7 @@ while running:
             if event.button == 1: # left, 2 middle, 3 right
                 if start_button.rect.collidepoint(event.pos) and interactable == True: # collided with mouse. event.pos gets mouse coords
                     gamestate = "Start"
-                    minesweeper_start()
+                    # minesweeper_start()
 
     #    movements(player.rect)
     screen.blit(black_fading, (0, 0))
