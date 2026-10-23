@@ -3,8 +3,6 @@ import pygame
 ### initialization ###
 pygame.display.init()
 pygame.font.init()
-WHITE = (255, 255, 255)
-BLACK = (0, 0, 0)
 
 
 def movements(player):
