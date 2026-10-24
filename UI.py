@@ -1,4 +1,6 @@
 import pygame
+import math
+import configurating
 
 ### initialization ###
 pygame.display.init()

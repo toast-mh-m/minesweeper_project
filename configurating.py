@@ -1,5 +1,20 @@
 import random
-import minesweeper
+
+def number_images(number_sheet, tile_scale):
+   number_0 = number_sheet.get_image(11, 13, 23, tile_scale)
+   number_1 = number_sheet.get_image(10, 13, 23, tile_scale)
+   number_2 = number_sheet.get_image(9, 13, 23, tile_scale)
+   number_3 = number_sheet.get_image(8, 13, 23, tile_scale)
+   number_4 = number_sheet.get_image(7, 13, 23, tile_scale)
+   number_5 = number_sheet.get_image(6, 13, 23, tile_scale)
+   number_6 = number_sheet.get_image(5, 13, 23, tile_scale)
+   number_7 = number_sheet.get_image(4, 13, 23, tile_scale)
+   number_8 = number_sheet.get_image(3, 13, 23, tile_scale)
+   number_9 = number_sheet.get_image(2, 13, 23, tile_scale)
+   number_blank = number_sheet.get_image(1, 13, 23, tile_scale)
+   number_neg = number_sheet.get_image(0, 13, 23, tile_scale)
+
+   return number_0, number_1, number_2, number_3, number_4, number_5, number_6, number_7, number_8, number_9, number_blank, number_neg
 
 def make_tiles(num_rows, num_columns, tile_sheet, tile_scale, SCREEN_WIDTH, SCREEN_HEIGHT, Tile, tiles, sweeper_map, sweeper_map_location, mines):
     # ======================================== TILE APPEARANCES ========================================
@@ -30,12 +45,11 @@ def make_tiles(num_rows, num_columns, tile_sheet, tile_scale, SCREEN_WIDTH, SCRE
     # ======================================== SELECTING WHICH TILES ARE MINES ========================================
     old_positions = [-1]
     same = -1
-    for i in range(mines):
+    for _ in range(mines):
         while same in old_positions:
             mine_position = random.randint(0, (len(sweeper_map) - 1))
             same = mine_position
         old_positions.append(mine_position)
-        # print(mine_position)
         for tile in tiles:
             if tiles[mine_position] == tile:
                 tile.revealed = tile_death_mine
@@ -97,70 +111,55 @@ def make_tiles(num_rows, num_columns, tile_sheet, tile_scale, SCREEN_WIDTH, SCRE
 
         tile_position += 1
 
-# def reveal_tiles_around(tiles, tile_position, num_columns, num_rows, sweeper_map):
-#     is_on_left_edge = tile_position % num_columns == 0
-#     is_on_right_edge = (tile_position + 1) % num_columns == 0
-#     is_on_top_row = tile_position < num_columns
-#     is_on_bottom_row = tile_position > (num_columns * num_rows) - num_columns - 1
+def reveal_tiles_around(tiles, tile_position, num_columns, num_rows, sweeper_map):
+    # If the selected tile is empty, the algorithm first examines the tile to the right, then continues moving right until it reaches a terminal tile of that direction. 
+    # (terminal tile here means reaching a mine or a number).
+    # From there, it traverses downwards, then left, and finally upward. 
+    # When a teminal tile is reached, then algorithm reveals it, and then backtracks to the previous tile to continue the process
+    # DEPTHS FIRST SEARCH
 
-#     clear_surroundings = { "left" : not(is_on_left_edge) and not(tiles[tile_position - 1].mine),
-#                             "right" : not(is_on_right_edge) and not(tiles[tile_position + 1].mine),
-#                             "top": not(is_on_top_row) and not(tiles[tile_position - num_columns].mine),
-#                             "bottom": not(is_on_bottom_row) and not(tiles[tile_position + num_columns].mine),
-#                             "top left": not(is_on_top_row) and not(is_on_left_edge) and not(tiles[tile_position - (num_columns + 1)].mine),
-#                             "top right": not(is_on_top_row) and not(is_on_right_edge) and not(tiles[tile_position - (num_columns - 1)].mine),
-#                             "bottom left": not(is_on_bottom_row) and not(is_on_left_edge) and not(tiles[tile_position + (num_columns - 1)].mine),
-#                             "bottom right": not(is_on_bottom_row) and not(is_on_right_edge) and not(tiles[tile_position + (num_columns + 1)].mine)
-#                         }
-#     around_position = 0
-#     temp_position = tile_position
-#     backlog_positions = []
-#     for tile in tiles:
-#         if tile.empty:
-#             for x in clear_surroundings:
-#                 around_position = check_surroundings_for_empty(x, clear_surroundings, temp_position, num_columns)
-#                 sweeper_map[around_position] = tiles[around_position].revealed
-#                 tiles[around_position].interactable = False
-#                 tile.empty_flag = False
-#                 if tiles[around_position].empty:
-#                     backlog_positions.append(around_position)
-#         elif backlog_positions:
-#             for x in clear_surroundings:
-#                 if not backlog_positions:
-#                     return
-#                 backlog_positions[0] = check_surroundings_for_empty(x, clear_surroundings, temp_position, num_columns)
-#                 around_position = backlog_positions[0]
-#                 sweeper_map[around_position] = tiles[around_position].revealed
-#                 tiles[around_position].interactable = False
-#                 tile.empty = False
-#                 backlog_positions.pop(0)
-#                 if tiles[around_position].empty:
-#                     backlog_positions.append(around_position)
-#         else:
-#             pass
+    # stack is (current pos, direction index)
+    stack = [(tile_position, 0)] # right 0, down 1, left 2, up 3
+    visited = {tile_position}
 
-                
+    # reveal the first tile
+    sweeper_map[tile_position] = tiles[tile_position].revealed
 
+    while stack:
+        curr_pos, direction = stack[-1]
 
-# def check_surroundings_for_empty(x, clear_surroundings, temp_position, num_columns):
-#     around_position = 0
+        is_on_left_edge = curr_pos % num_columns == 0
+        is_on_right_edge = (curr_pos + 1) % num_columns == 0
+        is_on_top_row = curr_pos < num_columns
+        is_on_bottom_row = curr_pos > (num_columns * num_rows) - num_columns - 1
 
-#     match (x, clear_surroundings[x]):
-#         case ("left", True):
-#             around_position = temp_position - 1
-#         case ("right", True):
-#             around_position = temp_position + 1
-#         case ("top", True):
-#             around_position = temp_position - num_columns
-#         case ("bottom", True):
-#             around_position = temp_position + num_columns
-#         case ("top left", True):
-#             around_position = temp_position - (num_columns + 1)
-#         case ("top right", True):
-#             around_position = temp_position - (num_columns - 1)
-#         case ("bottom left", True):
-#             around_position = temp_position + (num_columns - 1)
-#         case ("bottom right", True):
-#             around_position = temp_position + (num_columns + 1)
+        next_pos = None
 
-#     return around_position
+        # check directions sequentially
+        match direction:
+            case 0 if not is_on_right_edge: # right
+                next_pos = curr_pos + 1
+            case 1 if not is_on_bottom_row: # bottom
+                next_pos = curr_pos + num_columns
+            case 2 if not is_on_left_edge: # left
+                next_pos = curr_pos - 1
+            case 3 if not is_on_top_row: # up
+                next_pos = curr_pos - num_columns
+
+        # if next_pos exists and was not previously visited
+        if next_pos is not None and next_pos not in visited: 
+            visited.add(next_pos)
+
+            sweeper_map[next_pos] = tiles[next_pos].revealed
+            tiles[next_pos].interactable = False
+
+            # if this tile is empty, append it for next stack
+            if tiles[next_pos].empty:
+                stack.append((next_pos, 0))
+                continue
+        
+        # if direction is less than 3 (not up just yet)
+        if direction < 3:
+            stack[-1] = (curr_pos, direction + 1)
+        else:
+            stack.pop()
