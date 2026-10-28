@@ -27,7 +27,7 @@ def make_tiles(num_rows, num_columns, tile_sheet, tile_scale, SCREEN_WIDTH, SCRE
     tile_six = tile_sheet.get_image(9, 16, 16, tile_scale)
     tile_seven = tile_sheet.get_image(8, 16, 16, tile_scale)
     tile_eight = tile_sheet.get_image(7, 16, 16, tile_scale)
-    tile_death_mine = tile_sheet.get_image(3, 16, 16, tile_scale)
+    tile_normal_mine = tile_sheet.get_image(5, 16, 16, tile_scale)
 
     # ======================================== CREATING ALL TILES ========================================
     for rows in range(num_rows):
@@ -52,7 +52,7 @@ def make_tiles(num_rows, num_columns, tile_sheet, tile_scale, SCREEN_WIDTH, SCRE
         old_positions.append(mine_position)
         for tile in tiles:
             if tiles[mine_position] == tile:
-                tile.revealed = tile_death_mine
+                tile.revealed = tile_normal_mine
                 tile.mine = True
 
     # ======================================== NON-MINE TILES DETECTING MINES AROUND THEM  ========================================
@@ -133,17 +133,30 @@ def reveal_tiles_around(tiles, tile_position, num_columns, num_rows, sweeper_map
         is_on_top_row = curr_pos < num_columns
         is_on_bottom_row = curr_pos > (num_columns * num_rows) - num_columns - 1
 
+        is_on_top_left = is_on_top_row or is_on_left_edge
+        is_on_top_right = is_on_top_row or is_on_right_edge
+        is_on_bottom_left = is_on_bottom_row or is_on_left_edge
+        is_on_bottom_right = is_on_bottom_row or is_on_right_edge
+
         next_pos = None
 
         # check directions sequentially
         match direction:
-            case 0 if not is_on_right_edge: # right
+            case 0 if not is_on_top_right: # top right
+                next_pos = curr_pos - num_columns + 1
+            case 1 if not is_on_top_left: # top left
+                next_pos = curr_pos - num_columns - 1
+            case 2 if not is_on_bottom_right: # bottom right
+                next_pos = curr_pos + num_columns + 1
+            case 3 if not is_on_bottom_left: # bottom left
+                next_pos = curr_pos + num_columns - 1
+            case 4 if not is_on_right_edge: # right
                 next_pos = curr_pos + 1
-            case 1 if not is_on_bottom_row: # bottom
+            case 5 if not is_on_bottom_row: # bottom
                 next_pos = curr_pos + num_columns
-            case 2 if not is_on_left_edge: # left
+            case 6 if not is_on_left_edge: # left
                 next_pos = curr_pos - 1
-            case 3 if not is_on_top_row: # up
+            case 7 if not is_on_top_row: # up
                 next_pos = curr_pos - num_columns
 
         # if next_pos exists and was not previously visited
@@ -159,7 +172,7 @@ def reveal_tiles_around(tiles, tile_position, num_columns, num_rows, sweeper_map
                 continue
         
         # if direction is less than 3 (not up just yet)
-        if direction < 3:
+        if direction < 7:
             stack[-1] = (curr_pos, direction + 1)
         else:
             stack.pop()

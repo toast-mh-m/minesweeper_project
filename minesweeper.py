@@ -165,3 +165,12 @@ def mines_display(mines, mine_num_img, number_sheet, tile_scale):
         img_position += 1
 
     return mines, mine_num_img
+
+def face_sheet_config(face_sheet, tile_scale, SCR_W, SCR_H, num_columns, num_rows):
+   size = tile_scale - 0.25
+   face_sheet_img = face_sheet.get_image(4, 24, 24, size)
+   x_local = (25 * tile_scale) + (SCR_W // 2) - (num_columns * 3.9 * tile_scale)
+   y_local = (25 * tile_scale) + (SCR_H // 2) - (num_rows * 13.43 * tile_scale)
+   face_sheet_local = (x_local, y_local)
+
+   return face_sheet_img, face_sheet_local, size

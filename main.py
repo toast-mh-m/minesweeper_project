@@ -8,8 +8,19 @@ import random
 pygame.display.init()
 pygame.font.init()
 running = True
+end_game = False
 clock = pygame.time.Clock()
 minesweeper_time = 0
+# =============== OTHER VARIABLES / VALUES =============== #
+gamestate = 0
+
+# =============== SWEEPER VARIABLES =============== #
+ALIVE =  True
+sweeper_map = []
+sweeper_map_location = []
+tiles = []
+tile_scale = 2
+mines = 10
 
 # =============== WINDOW =============== #
 SCREEN_WIDTH, SCREEN_HEIGHT = 1000, 1000
@@ -24,7 +35,7 @@ black_fading.fill(BLACK)
 fading_value = 255
 fading_time = 3
 
-# =============== ENTITIES or just all things drawn =============== #
+# =============== BUTTONS, TEXT, & EVERYTHING ELSE =============== #
 header_text = UI.Text("Minesweeper", 60, "center", "center", WHITE, screen)
 
 start_button = UI.Button("center", 750, 100, 50, "Start", "Start", 20, WHITE, screen, BLACK, False)
@@ -37,22 +48,19 @@ TEST_CENTER = UI.Button("center", "center", 10, 10, "", "", 0, BLACK, screen, (2
 
 buttons = [start_button, settings_button]
 
+# =============== MINESWEEPER UI =============== #
 tile_sheet_image = pygame.image.load("assets/tile_sheet.png").convert_alpha()
 tile_sheet = minesweeper.SpriteSheet(tile_sheet_image)
 
 number_sheet_image = pygame.image.load("assets/number_sheet.png").convert_alpha()
 number_sheet = minesweeper.SpriteSheet(number_sheet_image)
 
-# =============== OTHER VARIABLES / VALUES =============== #
-gamestate = 0
+face_sheet_image = pygame.image.load("assets/face_sheet.png").convert_alpha()
+face_sheet = minesweeper.SpriteSheet(face_sheet_image)
+face_sheet_img, face_sheet_local, face_size = minesweeper.face_sheet_config(face_sheet, tile_scale, SCREEN_WIDTH, SCREEN_HEIGHT, minesweeper.num_columns, minesweeper.num_rows)
+face_area = pygame.Rect((0, 0, face_sheet_img.get_width(), face_sheet_img.get_height()))
+face_area = UI.Button(face_sheet_local[0], face_sheet_local[1], face_size, face_size, "", "", 0, BLACK, screen, BLACK, False)
 
-# =============== SWEEPER VARIABLES =============== #
-ALIVE =  True
-sweeper_map = []
-sweeper_map_location = []
-tiles = []
-tile_scale = 2
-mines = 10
 
 # =============== TIMER VARIABLES =============== #
 timer_active = False
@@ -60,10 +68,9 @@ timer_num_img, timer_num_local = minesweeper.minesweeper_timer(number_sheet, til
 mine_num_img, mine_num_local = minesweeper.remaining_mines(number_sheet, tile_scale, SCREEN_WIDTH, SCREEN_HEIGHT, minesweeper.num_columns, minesweeper.num_rows)
 # =============== RUNNING =============== #
 while running:
-    screen.fill((0, 0, 255))
+    screen.fill((255, 0, 255))
     mouse_pos = pygame.mouse.get_pos()
     clickable_mouse = False
-    # screen.blit(tile_sheet, (0, 0))
 
     # =============== GAMESTATE =============== #
     match gamestate:
@@ -94,6 +101,9 @@ while running:
                 screen.blit(timer_num_img[i], timer_num_local[i])
                 screen.blit(mine_num_img[i], mine_num_local[i])
 
+            pygame.draw.rect(screen, (0, 0, 0), face_area, 0)
+            screen.blit(face_sheet_img, face_sheet_local)
+
         case "Settings":
             print("SETTINGS") # placeholder
             
@@ -114,28 +124,38 @@ while running:
                 button.text = UI.fontrendering(button.base_text, 20, WHITE)
 
 
-        for i, tile in enumerate(tiles):
-            if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1 and tile.rect.collidepoint(mouse_pos) and tile.interactable == True and tile.flagged == False: # clicking on a non-flagged tile
-                    tile.interactable = False
-                    sweeper_map[i] = tile.revealed
-                    timer_active = True
-                    if tile.empty:
-                        configurating.reveal_tiles_around(tiles, i, minesweeper.num_columns, minesweeper.num_rows, sweeper_map)
+        if end_game == False:
+            for i, tile in enumerate(tiles):
+                if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1 and tile.rect.collidepoint(mouse_pos) and tile.interactable == True and tile.flagged == False: # clicking on a non-flagged tile
+                        tile.interactable = False
+                        if tile.mine:
+                            tile.revealed = tile_sheet.get_image(3, 16, 16, tile_scale)
+                            sweeper_map[i] = tile.revealed
+                            end_game = True
+                        else:
+                            sweeper_map[i] = tile.revealed
+                            timer_active = True
+                        if tile.empty:
+                            configurating.reveal_tiles_around(tiles, i, minesweeper.num_columns, minesweeper.num_rows, sweeper_map)
 
-            elif event.type == pygame.MOUSEBUTTONDOWN and event.button == 3 and tile.rect.collidepoint(mouse_pos) and tile.interactable == True: # right clicking on a tile
+                elif event.type == pygame.MOUSEBUTTONDOWN and event.button == 3 and tile.rect.collidepoint(mouse_pos) and tile.interactable == True: # right clicking on a tile
+                    
+                    if tile.flagged == True:
+                        sweeper_map[i] = tile_sheet.get_image(0, 16, 16, tile_scale)
+                        tile.flagged = False
+                        mines += 1
+                    else:
+                        sweeper_map[i] = tile_sheet.get_image(1, 16, 16, tile_scale)
+                        tile.flagged = True
+                        mines -= 1
                 
-                if tile.flagged == True:
-                    sweeper_map[i] = tile_sheet.get_image(0, 16, 16, tile_scale)
-                    tile.flagged = False
-                    mines += 1
-                else:
-                    sweeper_map[i] = tile_sheet.get_image(1, 16, 16, tile_scale)
-                    tile.flagged = True
-                    mines -= 1
-            
-            elif tile.rect.collidepoint(mouse_pos) and tile.interactable == True: # hovering over any non-revealed tile
-                clickable_mouse = True
+                elif tile.rect.collidepoint(mouse_pos) and tile.interactable == True: # hovering over any non-revealed tile
+                    clickable_mouse = True
+        elif end_game:
+            timer_active = False
 
+        if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1 and face_area.rect.collidepoint(mouse_pos) and face_area.interactable == True:
+            pass
 
         if clickable_mouse:
             pygame.mouse.set_cursor(pygame.SYSTEM_CURSOR_HAND)
@@ -150,6 +170,7 @@ while running:
                     gamestate = "Start"
                     start_button.interactable = False
                     settings_button.interactable = False
+                    face_area.interactable = True
                     configurating.make_tiles(minesweeper.num_rows, minesweeper.num_columns, tile_sheet, tile_scale, SCREEN_WIDTH, SCREEN_HEIGHT, minesweeper.Tile, tiles, sweeper_map, sweeper_map_location, mines)
                     for tile in tiles:
                         tile.interactable = True
