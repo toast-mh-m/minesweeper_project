@@ -1,20 +1,21 @@
 import random
 
 def number_images(number_sheet, tile_scale):
-   number_0 = number_sheet.get_image(11, 13, 23, tile_scale)
-   number_1 = number_sheet.get_image(10, 13, 23, tile_scale)
-   number_2 = number_sheet.get_image(9, 13, 23, tile_scale)
-   number_3 = number_sheet.get_image(8, 13, 23, tile_scale)
-   number_4 = number_sheet.get_image(7, 13, 23, tile_scale)
-   number_5 = number_sheet.get_image(6, 13, 23, tile_scale)
-   number_6 = number_sheet.get_image(5, 13, 23, tile_scale)
-   number_7 = number_sheet.get_image(4, 13, 23, tile_scale)
-   number_8 = number_sheet.get_image(3, 13, 23, tile_scale)
-   number_9 = number_sheet.get_image(2, 13, 23, tile_scale)
-   number_blank = number_sheet.get_image(1, 13, 23, tile_scale)
-   number_neg = number_sheet.get_image(0, 13, 23, tile_scale)
+    size = tile_scale - 0.25
+    number_0 = number_sheet.get_image(11, 13, 23, size)
+    number_1 = number_sheet.get_image(10, 13, 23, size)
+    number_2 = number_sheet.get_image(9, 13, 23, size)
+    number_3 = number_sheet.get_image(8, 13, 23, size)
+    number_4 = number_sheet.get_image(7, 13, 23, size)
+    number_5 = number_sheet.get_image(6, 13, 23, size)
+    number_6 = number_sheet.get_image(5, 13, 23, size)
+    number_7 = number_sheet.get_image(4, 13, 23, size)
+    number_8 = number_sheet.get_image(3, 13, 23, size)
+    number_9 = number_sheet.get_image(2, 13, 23, size)
+    number_blank = number_sheet.get_image(1, 13, 23, size)
+    number_neg = number_sheet.get_image(0, 13, 23, size)
 
-   return number_0, number_1, number_2, number_3, number_4, number_5, number_6, number_7, number_8, number_9, number_blank, number_neg
+    return number_0, number_1, number_2, number_3, number_4, number_5, number_6, number_7, number_8, number_9, number_blank, number_neg
 
 def make_tiles(num_rows, num_columns, tile_sheet, tile_scale, SCREEN_WIDTH, SCREEN_HEIGHT, Tile, tiles, sweeper_map, sweeper_map_location, mines):
     # ======================================== TILE APPEARANCES ========================================

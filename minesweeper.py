@@ -35,10 +35,11 @@ class Tile:
 def minesweeper_timer(number_sheet, tile_scale, SCR_W, SCR_H, num_columns, num_rows):
    timer_num_img = []
    timer_num_local = []
-
+   
    for i in range(3):
+      j = i / 1.12
       digit = number_sheet.get_image(1, 13, 23, tile_scale)
-      x_local = (i * (13 * tile_scale)) + ((SCR_W // 2)) + (num_columns * 3.7 * tile_scale)
+      x_local = (j * 13 * tile_scale) + ((SCR_W // 2)) + (num_columns * 4 * tile_scale)
       y_local = ((23 * tile_scale)) + ((SCR_H // 2)) - (num_rows * 13.1 * tile_scale)
       digit_location = (x_local, y_local)
 
@@ -99,8 +100,9 @@ def remaining_mines(number_sheet, tile_scale, SCR_W, SCR_H, num_columns, num_row
    mine_num_local = []
 
    for i in range(3):
+      j = i / 1.12
       digit = number_sheet.get_image(1, 13, 23, tile_scale)
-      x_local = (i * (13 * tile_scale)) + ((SCR_W // 2)) - (num_columns * 8 * tile_scale)
+      x_local = (j * (13 * tile_scale)) + ((SCR_W // 2)) - (num_columns * 8 * tile_scale)
       y_local = ((23 * tile_scale)) + ((SCR_H // 2)) - (num_rows * 13.1 * tile_scale)
       digit_location = (x_local, y_local)
 
@@ -166,11 +168,30 @@ def mines_display(mines, mine_num_img, number_sheet, tile_scale):
 
     return mines, mine_num_img
 
-def face_sheet_config(face_sheet, tile_scale, SCR_W, SCR_H, num_columns, num_rows):
-   size = tile_scale - 0.25
-   face_sheet_img = face_sheet.get_image(4, 24, 24, size)
-   x_local = (25 * tile_scale) + (SCR_W // 2) - (num_columns * 3.9 * tile_scale)
-   y_local = (25 * tile_scale) + (SCR_H // 2) - (num_rows * 13.43 * tile_scale)
-   face_sheet_local = (x_local, y_local)
+class Face:
+   def __init__(self, face_sheet, tile_scale, SCR_W, SCR_H, interactable):
+      size = tile_scale - 0.25
+      self.img = face_sheet.get_image(4, 24, 24, size)
+      self.img_size = 24 * size
+      self.x = (25 * tile_scale) + (SCR_W // 2) - (num_columns * 3.9 * tile_scale)
+      self.y = (25 * tile_scale) + (SCR_H // 2) - (num_rows * 13.43 * tile_scale)
+      self.interactable = interactable
+      self.rect = pygame.Rect((self.x, self.y, self.img_size, self.img_size))
 
-   return face_sheet_img, face_sheet_local, size
+def change_face(face_sprite, wanted_image, face_sheet):
+   frame = None
+   match wanted_image:
+      case "clicked":
+         frame = 0
+      case "win":
+         frame = 1
+      case "lost":
+         frame = 2
+      case "surprised":
+         frame = 3
+      case "smile":
+         frame = 4
+
+   img = face_sheet.get_image(frame, 24, 24, (face_sprite.img_size / 24))
+
+   return img
