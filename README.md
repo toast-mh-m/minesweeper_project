@@ -2,8 +2,8 @@
 
 ---
 
-## so far, I have redone minesweeper!
-## this is my first attempt at a pygame game; also first time ever using pygame.
+so far, I have redone minesweeper!
+this is my first attempt at a pygame game; also first time ever using pygame.
 
 To-Do List:
 - [ ] face reacts to pressing down left click
