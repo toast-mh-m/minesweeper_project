@@ -21,3 +21,5 @@ download:
 1. press green " <> Code " dropdown
 2. last option, " Download Zip "
 3. run *main.py*
+
+you may edit the number of rows, columns, tile scale (how big everything is), and mines in the *minesweeper.py* file.
