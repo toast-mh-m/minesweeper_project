@@ -1,7 +1,5 @@
 # my version of minesweeper!
 
----
-
 so far, I have redone minesweeper!
 this is my first attempt at a pygame game; also first time ever using pygame.
 
