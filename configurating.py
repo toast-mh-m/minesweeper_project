@@ -38,7 +38,7 @@ def make_tiles(num_rows, num_columns, tile_sheet, tile_scale, SCREEN_WIDTH, SCRE
             y_local = (rows * (16 * tile_scale)) + ((SCREEN_HEIGHT // 2)) - (num_rows * 8 * tile_scale)
             temp_tile_location = (x_local, y_local)
 
-            temp_tile = Tile(temp_tile_img, temp_tile_location, False, tile_sheet, tile_scale)
+            temp_tile = Tile(temp_tile_img, temp_tile_location, False)
             tiles.append(temp_tile)
             sweeper_map.append(temp_tile.img)
             sweeper_map_location.append(temp_tile.location)
@@ -53,7 +53,7 @@ def make_tiles(num_rows, num_columns, tile_sheet, tile_scale, SCREEN_WIDTH, SCRE
         old_positions.append(mine_position)
         for tile in tiles:
             if tiles[mine_position] == tile:
-                tile.revealed = tile_normal_mine
+                tile.revealed_img = tile_normal_mine
                 tile.mine = True
 
     # ======================================== NON-MINE TILES DETECTING MINES AROUND THEM  ========================================
@@ -75,7 +75,7 @@ def make_tiles(num_rows, num_columns, tile_sheet, tile_scale, SCREEN_WIDTH, SCRE
                                          "bottom left": not(is_on_bottom_row) and not(is_on_left_edge) and tiles[tile_position + (num_columns - 1)].mine,
                                          "bottom right": not(is_on_bottom_row) and not(is_on_right_edge) and tiles[tile_position + (num_columns + 1)].mine
                                         }    
-        if tile.revealed == None:
+        if tile.revealed_img == None:
             checks = sum([check_surroundings_for_mines["left"],
                           check_surroundings_for_mines["right"],
                           check_surroundings_for_mines["top"],
@@ -91,24 +91,24 @@ def make_tiles(num_rows, num_columns, tile_sheet, tile_scale, SCREEN_WIDTH, SCRE
         if tile.mine == False:
             match tile_number:
                 case 0:
-                    tile.revealed = tile_empty
+                    tile.revealed_img = tile_empty
                     tile.empty = True
                 case 1:
-                    tile.revealed = tile_one
+                    tile.revealed_img = tile_one
                 case 2:
-                    tile.revealed = tile_two
+                    tile.revealed_img = tile_two
                 case 3:
-                    tile.revealed = tile_three
+                    tile.revealed_img = tile_three
                 case 4:
-                    tile.revealed = tile_four
+                    tile.revealed_img = tile_four
                 case 5:
-                    tile.revealed = tile_five
+                    tile.revealed_img = tile_five
                 case 6:
-                    tile.revealed = tile_six
+                    tile.revealed_img = tile_six
                 case 7:
-                    tile.revealed = tile_seven
+                    tile.revealed_img = tile_seven
                 case 8:
-                    tile.revealed = tile_eight
+                    tile.revealed_img = tile_eight
 
         tile_position += 1
 
@@ -124,7 +124,8 @@ def reveal_tiles_around(tiles, tile_position, num_columns, num_rows, sweeper_map
     visited = {tile_position}
 
     # reveal the first tile
-    sweeper_map[tile_position] = tiles[tile_position].revealed
+    sweeper_map[tile_position] = tiles[tile_position].revealed_img
+    tiles[tile_position].revealed = True
 
     while stack:
         curr_pos, direction = stack[-1]
@@ -164,8 +165,9 @@ def reveal_tiles_around(tiles, tile_position, num_columns, num_rows, sweeper_map
         if next_pos is not None and next_pos not in visited: 
             visited.add(next_pos)
 
-            sweeper_map[next_pos] = tiles[next_pos].revealed
+            sweeper_map[next_pos] = tiles[next_pos].revealed_img
             tiles[next_pos].interactable = False
+            tiles[next_pos].revealed = True
 
             # if this tile is empty, append it for next stack
             if tiles[next_pos].empty:

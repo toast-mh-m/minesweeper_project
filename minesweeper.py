@@ -6,8 +6,12 @@ import configurating
 pygame.display.init()
 pygame.font.init()
 
-num_rows = 9
+num_rows = 10
 num_columns = 9
+tiles = []
+tile_scale = 3
+mines = 5
+total_mines = mines
 
 class SpriteSheet:
     def __init__(self, image):
@@ -21,16 +25,16 @@ class SpriteSheet:
         return image
 
 class Tile:
-    def __init__(self, img, location, interactable, sheet, tile_scale):
+    def __init__(self, img, location, interactable):
         self.img = img
         self.location = location
         self.interactable = interactable
         self.rect = img.get_rect(topleft=location)
-        self.revealed = None
+        self.revealed_img = None
+        self.revealed = False
         self.mine = False
         self.flagged = False
         self.empty = False
-        self.empty_flag = False
 
 def minesweeper_timer(number_sheet, tile_scale, SCR_W, SCR_H, num_columns, num_rows):
    timer_num_img = []
@@ -39,8 +43,21 @@ def minesweeper_timer(number_sheet, tile_scale, SCR_W, SCR_H, num_columns, num_r
    for i in range(3):
       j = i / 1.12
       digit = number_sheet.get_image(1, 13, 23, tile_scale)
-      x_local = (j * 13 * tile_scale) + ((SCR_W // 2)) + (num_columns * 4 * tile_scale)
-      y_local = ((23 * tile_scale)) + ((SCR_H // 2)) - (num_rows * 13.1 * tile_scale)
+
+      if num_columns % 2 == 0:
+         tiles_to_the_right = num_columns / 2 - 2.15
+         x_local = (j * 13 * tile_scale) + (SCR_W // 2) + (tiles_to_the_right * (16 * tile_scale))
+      else:
+         tiles_to_the_right = (num_columns / 2) - 0.5 - 2.15 
+         x_local = (j * 13 * tile_scale) + (SCR_W // 2) + (8 * tile_scale) + (tiles_to_the_right * (16 * tile_scale))
+
+      if num_rows % 2 == 0:
+         tiles_up_above = num_rows / 2 + 1.667
+         y_local = (SCR_H // 2) - (tiles_up_above * (16 * tile_scale))
+      else:
+         tiles_up_above = num_rows / 2 + 1.167
+         y_local = (SCR_H // 2) - (8 * tile_scale) - (tiles_up_above * (16 * tile_scale))
+
       digit_location = (x_local, y_local)
 
       timer_num_img.append(digit)
@@ -48,11 +65,15 @@ def minesweeper_timer(number_sheet, tile_scale, SCR_W, SCR_H, num_columns, num_r
 
    return timer_num_img, timer_num_local
 
-def timer(minesweeper_time, timer_active, timer_num_img, number_sheet, tile_scale):
+def timer(minesweeper_time, timer_active, timer_num_img, number_sheet, tile_scale, tick_sfx):
    number_0, number_1, number_2, number_3, number_4, number_5, number_6, number_7, number_8, number_9, number_blank, x = configurating.number_images(number_sheet, tile_scale)
+   compare_time = minesweeper_time
    
    if timer_active:
       minesweeper_time += 1/60
+
+   if int(compare_time) != int(math.trunc(minesweeper_time)):
+      tick_sfx.play()
 
    time_string = str(math.trunc(minesweeper_time))
    match len(time_string):
@@ -102,8 +123,20 @@ def remaining_mines(number_sheet, tile_scale, SCR_W, SCR_H, num_columns, num_row
    for i in range(3):
       j = i / 1.12
       digit = number_sheet.get_image(1, 13, 23, tile_scale)
-      x_local = (j * (13 * tile_scale)) + ((SCR_W // 2)) - (num_columns * 8 * tile_scale)
-      y_local = ((23 * tile_scale)) + ((SCR_H // 2)) - (num_rows * 13.1 * tile_scale)
+      if num_columns % 2 == 0:
+         tiles_to_the_left = num_columns / 2
+         x_local = (j * (13 * tile_scale)) + ((SCR_W // 2)) - (tiles_to_the_left * (16 * tile_scale))
+      else:
+         tiles_to_the_left = num_columns / 2 - 0.5
+         x_local = (j * (13 * tile_scale)) + ((SCR_W // 2)) - (8 * tile_scale) - (tiles_to_the_left * (16 * tile_scale))
+
+      if num_rows % 2 == 0:
+         tiles_up_above = num_rows / 2 + 1.667
+         y_local = (SCR_H // 2) - (tiles_up_above * (16 * tile_scale))
+      else:
+         tiles_up_above = num_rows / 2 + 1.167
+         y_local = (SCR_H // 2) - (8 * tile_scale) - (tiles_up_above * (16 * tile_scale))
+
       digit_location = (x_local, y_local)
 
       mine_num_img.append(digit)
@@ -173,8 +206,13 @@ class Face:
       size = tile_scale - 0.25
       self.img = face_sheet.get_image(4, 24, 24, size)
       self.img_size = 24 * size
-      self.x = (25 * tile_scale) + (SCR_W // 2) - (num_columns * 3.9 * tile_scale)
-      self.y = (25 * tile_scale) + (SCR_H // 2) - (num_rows * 13.43 * tile_scale)
+      self.x = (SCR_W // 2) - (12 * tile_scale)
+      if num_rows % 2 == 0: 
+         tiles_up_above = (num_rows / 2) + 1.75
+         self.y = (SCR_H // 2) - (tiles_up_above * (16 * tile_scale))
+      else:
+         tiles_up_above = ((num_rows / 2) - 0.5) + 1.75
+         self.y = (SCR_H // 2) - (8 * tile_scale) - (tiles_up_above * (16 * tile_scale))
       self.interactable = interactable
       self.rect = pygame.Rect((self.x, self.y, self.img_size, self.img_size))
 
