@@ -6,11 +6,11 @@ import configurating
 pygame.display.init()
 pygame.font.init()
 
-num_rows = 10
+num_rows = 9
 num_columns = 9
 tiles = []
 tile_scale = 3
-mines = 5
+mines = 10
 total_mines = mines
 
 class SpriteSheet:

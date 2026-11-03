@@ -6,42 +6,6 @@ import configurating
 pygame.display.init()
 pygame.font.init()
 
-
-def movements(player):
-   player_speed = 10
-   player_speed_diag = player_speed * 0.707
-   key_w, key_a, key_s, key_d = pygame.K_w, pygame.K_a, pygame.K_s, pygame.K_d
-   # movement
-   key = pygame.key.get_pressed()
-
-   if key[key_a] and key[key_w] == True:
-       player.move_ip(-player_speed_diag, -player_speed_diag)
-   elif key[key_d] and key[key_w] == True:
-      player.move_ip(player_speed_diag, -player_speed_diag)
-   elif key[key_a] and key[key_s] == True:
-      player.move_ip(-player_speed_diag, player_speed_diag)
-   elif key[key_d] and key[key_s] == True:
-      player.move_ip(player_speed_diag, player_speed_diag)
-   elif key[key_a] == True:
-      player.move_ip(-player_speed, 0)
-   elif key[key_d] == True:
-      player.move_ip(player_speed, 0)
-   elif key[key_w] ==  True:
-      player.move_ip(0, -player_speed)
-   elif key[key_s] == True:
-      player.move_ip(0, player_speed)
-
-   if key[pygame.K_1] == True:
-      print(pygame.mouse.get_pos())
-
-class Player:
-   def __init__(self, x, y, width, height):
-      self.x = x
-      self.y = y
-      self.width = width
-      self.height = height
-      self.rect = pygame.Rect((x, y, width, height))
-
 class Button:
    def __init__(self, x, y, width, height, base_text, text, font_size, font_color, screen, color, interactable):
       self.x = x
