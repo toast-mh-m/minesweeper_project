@@ -2,15 +2,20 @@ import pygame
 import math
 import configurating
 
-### initialization ###
 pygame.display.init()
 pygame.font.init()
 
-num_rows = 9
-num_columns = 9
-tiles = []
+num_rows = 12
+num_columns = 12
+
 tile_scale = 3
-mines = 10
+mines = 20
+minesweeper_time = 0
+
+tiles = []
+sweeper_map = []
+sweeper_map_location = []
+
 total_mines = mines
 
 class SpriteSheet:
@@ -26,17 +31,12 @@ class SpriteSheet:
 
 class Tile:
     def __init__(self, img, location, interactable):
-        self.img = img
-        self.location = location
-        self.interactable = interactable
+        self.img, self.location, self.interactable = img, location, interactable
         self.rect = img.get_rect(topleft=location)
         self.revealed_img = None
-        self.revealed = False
-        self.mine = False
-        self.flagged = False
-        self.empty = False
+        self.revealed = self.mine = self.flagged = self.empty = False
 
-def minesweeper_timer(number_sheet, tile_scale, SCR_W, SCR_H, num_columns, num_rows):
+def minesweeper_timer(number_sheet, SCR_W, SCR_H):
    timer_num_img = []
    timer_num_local = []
    
@@ -65,7 +65,7 @@ def minesweeper_timer(number_sheet, tile_scale, SCR_W, SCR_H, num_columns, num_r
 
    return timer_num_img, timer_num_local
 
-def timer(minesweeper_time, timer_active, timer_num_img, number_sheet, tile_scale, tick_sfx):
+def timer_display(minesweeper_time, timer_active, timer_num_img, number_sheet, tile_scale, tick_sfx):
    number_0, number_1, number_2, number_3, number_4, number_5, number_6, number_7, number_8, number_9, number_blank, x = configurating.number_images(number_sheet, tile_scale)
    compare_time = minesweeper_time
    
@@ -88,35 +88,36 @@ def timer(minesweeper_time, timer_active, timer_num_img, number_sheet, tile_scal
 
    img_position = 0
    for digit in visible_num:
-        match digit:
+      match digit:
          case "_":
-            timer_num_img[img_position] = number_blank
+            temp_num = number_blank
          case "0":
-            timer_num_img[img_position] = number_0
+            temp_num = number_0
          case "1":
-            timer_num_img[img_position] = number_1
+            temp_num = number_1
          case "2":
-            timer_num_img[img_position] = number_2
+            temp_num = number_2
          case "3":
-            timer_num_img[img_position] = number_3
+            temp_num = number_3
          case "4":
-            timer_num_img[img_position] = number_4
+            temp_num = number_4
          case "5":
-            timer_num_img[img_position] = number_5
+            temp_num = number_5
          case "6":
-            timer_num_img[img_position] = number_6
+            temp_num = number_6
          case "7":
-            timer_num_img[img_position] = number_7
+            temp_num = number_7
          case "8":
-            timer_num_img[img_position] = number_8
+            temp_num = number_8
          case "9":
-            timer_num_img[img_position] = number_9
+            temp_num = number_9
 
-        img_position += 1
+      timer_num_img[img_position] = temp_num
+      img_position += 1
    
    return minesweeper_time, timer_active, timer_num_img
 
-def remaining_mines(number_sheet, tile_scale, SCR_W, SCR_H, num_columns, num_rows):
+def remaining_mines(number_sheet, SCR_W, SCR_H):
    mine_num_img = []
    mine_num_local = []
 
@@ -171,38 +172,39 @@ def mines_display(mines, mine_num_img, number_sheet, tile_scale):
 
     img_position = 0
     for digit in display:
-        match digit:
-           case "_":
-                mine_num_img[img_position] = number_blank
-           case "0":
-                mine_num_img[img_position] = number_0
-           case "1":
-                mine_num_img[img_position] = number_1
-           case "2":
-                mine_num_img[img_position] = number_2
-           case "3":
-                mine_num_img[img_position] = number_3
-           case "4":
-                mine_num_img[img_position] = number_4
-           case "5":
-                mine_num_img[img_position] = number_5
-           case "6":
-                mine_num_img[img_position] = number_6
-           case "7":
-                mine_num_img[img_position] = number_7
-           case "8":
-                mine_num_img[img_position] = number_8
-           case "9":
-                mine_num_img[img_position] = number_9
-           case "-":
-                mine_num_img[img_position] = number_neg
+      match digit:
+         case "_":
+               temp_num = number_blank
+         case "0":
+               temp_num = number_0
+         case "1":
+               temp_num = number_1
+         case "2":
+               temp_num = number_2
+         case "3":
+               temp_num = number_3
+         case "4":
+               temp_num = number_4
+         case "5":
+               temp_num = number_5
+         case "6":
+               temp_num = number_6
+         case "7":
+               temp_num = number_7
+         case "8":
+               temp_num = number_8
+         case "9":
+               temp_num = number_9
+         case "-":
+               temp_num = number_neg
 
-        img_position += 1
+      mine_num_img[img_position] = temp_num
+      img_position += 1
 
     return mines, mine_num_img
 
 class Face:
-   def __init__(self, face_sheet, tile_scale, SCR_W, SCR_H, interactable):
+   def __init__(self, face_sheet, SCR_W, SCR_H, interactable):
       size = tile_scale - 0.25
       self.img = face_sheet.get_image(4, 24, 24, size)
       self.img_size = 24 * size
@@ -217,7 +219,6 @@ class Face:
       self.rect = pygame.Rect((self.x, self.y, self.img_size, self.img_size))
 
 def change_face(face_sprite, wanted_image, face_sheet):
-   frame = None
    match wanted_image:
       case "clicked":
          frame = 0

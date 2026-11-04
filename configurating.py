@@ -2,33 +2,25 @@ import random
 
 def number_images(number_sheet, tile_scale):
     size = tile_scale - 0.25
-    number_0 = number_sheet.get_image(11, 13, 23, size)
-    number_1 = number_sheet.get_image(10, 13, 23, size)
-    number_2 = number_sheet.get_image(9, 13, 23, size)
-    number_3 = number_sheet.get_image(8, 13, 23, size)
-    number_4 = number_sheet.get_image(7, 13, 23, size)
-    number_5 = number_sheet.get_image(6, 13, 23, size)
-    number_6 = number_sheet.get_image(5, 13, 23, size)
-    number_7 = number_sheet.get_image(4, 13, 23, size)
-    number_8 = number_sheet.get_image(3, 13, 23, size)
-    number_9 = number_sheet.get_image(2, 13, 23, size)
-    number_blank = number_sheet.get_image(1, 13, 23, size)
-    number_neg = number_sheet.get_image(0, 13, 23, size)
+    num_list = []
 
-    return number_0, number_1, number_2, number_3, number_4, number_5, number_6, number_7, number_8, number_9, number_blank, number_neg
+    for i in range(12):
+        image = number_sheet.get_image(i, 13, 23, size)
+        num_list.append(image)
+
+    neg, blank, num_9, num_8, num_7, num_6, num_5, num_4, num_3, num_2, num_1, num_0 = num_list
+    return num_0, num_1, num_2, num_3, num_4, num_5, num_6, num_7, num_8, num_9, blank, neg
 
 def make_tiles(num_rows, num_columns, tile_sheet, tile_scale, SCREEN_WIDTH, SCREEN_HEIGHT, Tile, tiles, sweeper_map, sweeper_map_location, mines):
     # ======================================== TILE APPEARANCES ========================================
-    tile_empty = tile_sheet.get_image(15, 16, 16, tile_scale)
-    tile_one = tile_sheet.get_image(14, 16, 16, tile_scale)
-    tile_two = tile_sheet.get_image(13, 16, 16, tile_scale)
-    tile_three = tile_sheet.get_image(12, 16, 16, tile_scale)
-    tile_four = tile_sheet.get_image(11, 16, 16, tile_scale)
-    tile_five = tile_sheet.get_image(10, 16, 16, tile_scale)
-    tile_six = tile_sheet.get_image(9, 16, 16, tile_scale)
-    tile_seven = tile_sheet.get_image(8, 16, 16, tile_scale)
-    tile_eight = tile_sheet.get_image(7, 16, 16, tile_scale)
-    tile_normal_mine = tile_sheet.get_image(5, 16, 16, tile_scale)
+    tile_list = []
+    for i in range(11):
+        if i + 5 == 6:
+            pass
+        else:
+            image = tile_sheet.get_image(i + 5, 16, 16, tile_scale)
+            tile_list.append(image)
+    tile_normal_mine, tile_eight, tile_seven, tile_six, tile_five, tile_four, tile_three, tile_two, tile_one, tile_empty = tile_list
 
     # ======================================== CREATING ALL TILES ========================================
     for rows in range(num_rows):
@@ -44,17 +36,17 @@ def make_tiles(num_rows, num_columns, tile_sheet, tile_scale, SCREEN_WIDTH, SCRE
             sweeper_map_location.append(temp_tile.location)
 
     # ======================================== SELECTING WHICH TILES ARE MINES ========================================
-    old_positions = [-1]
-    same = -1
-    for _ in range(mines):
-        while same in old_positions:
-            mine_position = random.randint(0, (len(sweeper_map) - 1))
-            same = mine_position
-        old_positions.append(mine_position)
-        for tile in tiles:
-            if tiles[mine_position] == tile:
-                tile.revealed_img = tile_normal_mine
-                tile.mine = True
+    old_positions = []
+
+    while len(old_positions) < mines:
+        mine_position = random.randint(0, len(sweeper_map) - 1)
+
+        if mine_position not in old_positions:
+            old_positions.append(mine_position)
+
+            target_tile = tiles[mine_position]
+            target_tile.revealed_img = tile_normal_mine
+            target_tile.mine = True
 
     # ======================================== NON-MINE TILES DETECTING MINES AROUND THEM  ========================================
     tile_position = 0
