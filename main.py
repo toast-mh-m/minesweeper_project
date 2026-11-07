@@ -22,7 +22,7 @@ def drawrect(color, rect):
 def loadimg(folder, image):
     return pygame.image.load(os.path.join(folder, image)).convert_alpha()
 
-def drawtext(text, location):
+def drawblit(text, location):
     return screen.blit(text, location)
 
 # =============== VARIABLES REGARDING EVERYTHING =============== #
@@ -32,7 +32,7 @@ running = True
 end_game = win = timer_active = False
 
 fading_value = 255
-fading_time = 5
+fading_time = 3
 
 WHITE = (255, 255, 255)
 BLACK = (0, 0, 0)
@@ -52,11 +52,16 @@ header_text = UI.Text("Minesweeper", 60, "center", "center", WHITE, screen)
 
 start_button = UI.Button("center", 750, 100, 50, "Start", "Start", 20, WHITE, screen, BLACK, False)
 outline_start_button = UI.Button("center", 750, 110, 60, "", "", 0, WHITE, screen, WHITE, False)
+
 settings_button = UI.Button("center", 825, 100, 50, "Settings", "Settings", 20, WHITE, screen, BLACK, False)
 outline_settings_button = UI.Button("center", 825, 110, 60, "", "", 0, WHITE, screen, WHITE, False)
+
 back_button = UI.Button(35, 20, 75, 50, "\N{LEFTWARDS ARROW} Back", "\N{LEFTWARDS ARROW} Back", 20, WHITE, screen, BLACK, False)
 
-buttons = [start_button, settings_button, back_button]
+quit_button = UI.Button("center", 900, 100, 50, "Quit", "Quit", 20, WHITE, screen, BLACK, False)
+outline_quit_button = UI.Button("center", 900, 110, 60, "", "", 0, WHITE, screen, WHITE, False)
+
+buttons = [start_button, settings_button, back_button, quit_button]
 
 tile_sheet_image = loadimg("assets", "tile_sheet.png")
 number_sheet_image = loadimg("assets", "number_sheet.png")
@@ -71,6 +76,9 @@ face = minesweeper.Face(face_sheet, SCREEN_WIDTH, SCREEN_HEIGHT, False)
 timer_num_img, timer_num_local = minesweeper.minesweeper_timer(number_sheet, SCREEN_WIDTH, SCREEN_HEIGHT)
 mine_num_img, mine_num_local = minesweeper.remaining_mines(number_sheet, SCREEN_WIDTH, SCREEN_HEIGHT)
 
+credits = UI.Button((SCREEN_WIDTH - 50), (SCREEN_HEIGHT - 60), 100, 50, "made by /jm\\", "made by /jm\\", 15, WHITE, screen, BLACK, False)
+
+
 # =============== RUNNING =============== #
 while running:
     screen.fill(GRAY)
@@ -79,35 +87,35 @@ while running:
 
     # =============== GAMESTATE =============== #
     match gamestate:
-        case "Menu": # =============== BEGINNING SCREEN =============== #
-            for button in [outline_start_button, start_button, outline_settings_button, settings_button]:
+        case "Menu": # =============== MENU SCREEN =============== #
+            for button in [outline_start_button, start_button, outline_settings_button, settings_button, credits, outline_quit_button, quit_button]:
                 drawrect(button.color, button.rect)
 
-            for text in [header_text, start_button, settings_button]:
-                drawtext(text.text, text.location)
+            for text in [header_text, start_button, settings_button, credits, quit_button]:
+                drawblit(text.text, text.location)
 
             if fading_value >= 0:
                 fading_value -= fading_time
-            if fading_value == 0:
-                start_button.interactable = settings_button.interactable = True
-        case "Start": # =============== GAMEPLAY =============== #
+            elif fading_value <= 0:
+                start_button.interactable = settings_button.interactable = quit_button.interactable = True
+        case "Start": # =============== GAMEPLAY SCREEN =============== #
             # ===== UPDATE TIMERS ====
             minesweeper.minesweeper_time, timer_active, timer_num_img = minesweeper.timer_display(minesweeper.minesweeper_time, timer_active, timer_num_img, number_sheet, minesweeper.tile_scale, tick_sfx)
             minesweeper.mines, mine_num_img = minesweeper.mines_display(minesweeper.mines, mine_num_img, number_sheet, minesweeper.tile_scale)
 
             # ===== SHOW ALL TILES =====
             for i in range(len(minesweeper.sweeper_map)):
-                screen.blit(minesweeper.sweeper_map[i], minesweeper.sweeper_map_location[i])
+                drawblit(minesweeper.sweeper_map[i], minesweeper.sweeper_map_location[i])
 
             for i in range(len(timer_num_img)):
-                screen.blit(timer_num_img[i], timer_num_local[i])
-                screen.blit(mine_num_img[i], mine_num_local[i])
+                drawblit(timer_num_img[i], timer_num_local[i])
+                drawblit(mine_num_img[i], mine_num_local[i])
 
 
             drawrect(BLACK, face.rect)
             drawrect(back_button.color, back_button.rect)
-            screen.blit(back_button.text, back_button.location)
-            screen.blit(face.img, (face.x, face.y))
+            drawblit(back_button.text, back_button.location)
+            drawblit(face.img, (face.x, face.y))
             back_button.interactable = True
 
 
@@ -115,9 +123,11 @@ while running:
         case "Settings": # =============== SETTINGS SCREEN =============== #
             back_button.interactable = True
             drawrect(back_button.color, back_button.rect)
-            drawtext(back_button.text, back_button.location)
+            drawblit(back_button.text, back_button.location)
 
-    # =============== EVENT HANDLER =============== #
+
+
+    # ============================== EVENT HANDLER ============================== #
     for ev in pygame.event.get():
         MOUSEDOWN = (ev.type == pygame.MOUSEBUTTONDOWN)
 
@@ -261,9 +271,16 @@ while running:
                     start_button.interactable = True
                     settings_button.interactable = True
 
+                if quit_button.rect.collidepoint(mouse_pos) and quit_button.interactable and gamestate == "Menu": # quitting
+                    start_button.interactable = settings_button.interactable = quit_button.interactable = False
+                    while fading_value < 255:
+                        fading_value -= 1
+
+                    running = False
 
 
-    screen.blit(black_fading, (0, 0))
+
+    drawblit(black_fading, (0, 0))
     black_fading.set_alpha(fading_value)
     windowone.flip()
     clock.tick(60)
