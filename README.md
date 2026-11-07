@@ -7,7 +7,7 @@ so far, I have redone minesweeper! this is my first attempt at a pygame game; al
 To-Do List:
 - [x] clean up and label code
 - [x] remove everything involving the player (*from first testing out pygame*)
-* [x] going back to main screen
+- [x] going back to main screen
 - [x] able to go back to main screen after starting the game!
 - [x] credits **to me**
 - [ ] quit button
