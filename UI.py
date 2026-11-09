@@ -46,6 +46,10 @@ class Text:
          case int() as x, int() as y:
             self.location = self.text.get_rect(center=(x, y))
 
+class Checkbox:
+   def __init__(self, x, y, image):
+      self.x = x
+
 def fontrendering(text, font_size, color):
   font = pygame.font.SysFont("Times New Roman", font_size)
   return font.render(text, True, color)

@@ -10,7 +10,7 @@ To-Do List:
 - [x] going back to main screen
 - [x] able to go back to main screen after starting the game!
 - [x] credits **to me**
-- [ ] quit button
+- [x] quit button
 - [ ] default settings
 - [ ] implement settings
 * tile scaling

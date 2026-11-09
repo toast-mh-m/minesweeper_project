@@ -22,3 +22,8 @@ with open("user\\config.txt") as f:
 configtxt = open("user\\test.txt", "x") # ADDING NEW TXT FILES
 os.remove("user\\test.txt") # REMOVING TXT FILES
 ```
+
+settings:
+* having a checkmark button that can be toggled on / off
+- * this will then activate a one-time thing that turns that selected thing into reality
+- * need rect, location, and image

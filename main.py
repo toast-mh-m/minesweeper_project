@@ -32,7 +32,7 @@ running = True
 end_game = win = timer_active = False
 
 fading_value = 255
-fading_time = 3
+fading_time = 5
 
 WHITE = (255, 255, 255)
 BLACK = (0, 0, 0)
@@ -125,7 +125,11 @@ while running:
             drawrect(back_button.color, back_button.rect)
             drawblit(back_button.text, back_button.location)
 
-
+        case "Quitting":
+            if fading_value < 255:
+                fading_value += fading_time
+            elif fading_value == 255:
+                running = False
 
     # ============================== EVENT HANDLER ============================== #
     for ev in pygame.event.get():
@@ -273,10 +277,7 @@ while running:
 
                 if quit_button.rect.collidepoint(mouse_pos) and quit_button.interactable and gamestate == "Menu": # quitting
                     start_button.interactable = settings_button.interactable = quit_button.interactable = False
-                    while fading_value < 255:
-                        fading_value -= 1
-
-                    running = False
+                    gamestate = "Quitting"
 
 
 
@@ -285,4 +286,5 @@ while running:
     windowone.flip()
     clock.tick(60)
 
+print("goodbye!")
 pygame.quit()
