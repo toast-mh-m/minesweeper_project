@@ -26,4 +26,21 @@ os.remove("user\\test.txt") # REMOVING TXT FILES
 settings:
 * having a checkmark button that can be toggled on / off
 - * this will then activate a one-time thing that turns that selected thing into reality
-- * need rect, location, and image
+
+what i want in the settings:
+### --- video & audio --- ###
+[ ] fullscreen? (y/n) [auto on yes]
+[ ] aspect ratio (selection of presets) [only available on no fullscreen, just grayed out]
+[ ] sound slider
+
+### --- gameplay --- ###
+[ ] amount of tiles [2 text boxes separated by an 'x'] (num rows by num columns)
+[ ] controls (for clicking tile, placing a flag, reseting board)
+[ ] free blank tile (symbol on random blank tile so you don't have to guess where to click first)
+[ ] score streak (y/n) [auto on yes]
+
+### --- visual/misc --- ###
+[ ] face skins (normal, weird, classic)
+[ ] tile skins (normal, low qual, classic)
+[ ] bg color (enter in RGB values lmao, 3 input boxes separated by commas and inside parenthesis)
+[ ] reset all settings and data to nothing (sadness)
