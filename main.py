@@ -26,7 +26,8 @@ def drawblit(text, location):
     return screen.blit(text, location)
 
 # =============== VARIABLES REGARDING EVERYTHING =============== #
-SCREEN_WIDTH, SCREEN_HEIGHT = display_info.current_w, display_info.current_h
+# SCREEN_WIDTH, SCREEN_HEIGHT = display_info.current_w, display_info.current_h
+SCREEN_WIDTH, SCREEN_HEIGHT = 900, 900
 gamestate = "Menu"
 running = True
 end_game = win = timer_active = False
@@ -40,7 +41,8 @@ GRAY = (50, 50, 50)
 
 # =============== WINDOW =============== #
 icon = pygame.image.load(os.path.join("assets", "icon.png"))
-windowone = pygame.window.Window(title="Minesweeper", fullscreen_desktop=True)
+# windowone = pygame.window.Window(title="Minesweeper", fullscreen_desktop=True)
+windowone = pygame.window.Window(title="Minesweeper", fullscreen_desktop=False, size=(SCREEN_WIDTH, SCREEN_HEIGHT))
 windowone.set_icon(icon)
 screen = windowone.get_surface()
 
@@ -48,18 +50,19 @@ black_fading = pygame.Surface((SCREEN_WIDTH, SCREEN_HEIGHT))
 black_fading.fill(BLACK)
 
 # =============== BUTTONS, TEXT, & IMAGES =============== #
+# == Menu
 header_text = UI.Text("Minesweeper", 60, "center", "center", WHITE, screen)
-
 start_button = UI.Button("center", 750, 100, 50, "Start", "Start", 20, WHITE, screen, BLACK, False)
 outline_start_button = UI.Button("center", 750, 110, 60, "", "", 0, WHITE, screen, WHITE, False)
-
 settings_button = UI.Button("center", 825, 100, 50, "Settings", "Settings", 20, WHITE, screen, BLACK, False)
 outline_settings_button = UI.Button("center", 825, 110, 60, "", "", 0, WHITE, screen, WHITE, False)
-
 back_button = UI.Button(35, 20, 75, 50, "\N{LEFTWARDS ARROW} Back", "\N{LEFTWARDS ARROW} Back", 20, WHITE, screen, BLACK, False)
-
 quit_button = UI.Button("center", 900, 100, 50, "Quit", "Quit", 20, WHITE, screen, BLACK, False)
 outline_quit_button = UI.Button("center", 900, 110, 60, "", "", 0, WHITE, screen, WHITE, False)
+
+# == Settings
+settings_header = UI.Text("~ Video & Audio ~", 25, 250, 160, WHITE, screen)
+fullscreen_text = UI.Text("Fullscreen?", 23, 100, 200, WHITE, screen)
 
 buttons = [start_button, settings_button, back_button, quit_button]
 
@@ -76,7 +79,7 @@ face = minesweeper.Face(face_sheet, SCREEN_WIDTH, SCREEN_HEIGHT, False)
 timer_num_img, timer_num_local = minesweeper.minesweeper_timer(number_sheet, SCREEN_WIDTH, SCREEN_HEIGHT)
 mine_num_img, mine_num_local = minesweeper.remaining_mines(number_sheet, SCREEN_WIDTH, SCREEN_HEIGHT)
 
-credits = UI.Button((SCREEN_WIDTH - 50), (SCREEN_HEIGHT - 60), 100, 50, "made by /jm\\", "made by /jm\\", 15, WHITE, screen, BLACK, False)
+credits = UI.Button((SCREEN_WIDTH - 48), (SCREEN_HEIGHT - 23), 100, 50, "made by /jm\\", "made by /jm\\", 15, WHITE, screen, BLACK, False)
 
 
 # =============== RUNNING =============== #
@@ -124,6 +127,9 @@ while running:
             back_button.interactable = True
             drawrect(back_button.color, back_button.rect)
             drawblit(back_button.text, back_button.location)
+
+            drawblit(fullscreen_text.text, fullscreen_text.location)
+            drawblit(settings_header.text, settings_header.location)
 
         case "Quitting":
             if fading_value < 255:

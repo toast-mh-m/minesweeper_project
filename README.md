@@ -23,7 +23,8 @@ To-Do List:
 ---
 
 thanks for checking this github out.
-download:
-1. press green " <> Code " dropdown
-2. last option, " Download Zip "
-3. run *main.py*
+alpha download:
+1. download pygame-ce (pip install pygame-ce)
+2. press green " <> Code " dropdown
+3. last option, " Download Zip "
+4. run *main.py*

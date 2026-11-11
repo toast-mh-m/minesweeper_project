@@ -23,6 +23,9 @@ class Button:
 
          case int() as x_value, int() as y_value:
             target_center = (x_value, y_value)
+
+         case _:
+            target_center = (x, y)
             
       self.rect.center = target_center
       self.location = self.text.get_rect(center=target_center)
