@@ -29,7 +29,7 @@ settings:
 
 what i want in the settings:
 ### --- video & audio --- ###
-[ ] fullscreen? (y/n) [auto on yes]
+[x] fullscreen? (y/n) [auto on yes]
 [ ] aspect ratio (selection of presets) [only available on no fullscreen, just grayed out]
 [ ] sound slider
 

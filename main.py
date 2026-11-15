@@ -26,7 +26,8 @@ def drawblit(text, location):
     return screen.blit(text, location)
 
 # =============== VARIABLES REGARDING EVERYTHING =============== #
-# SCREEN_WIDTH, SCREEN_HEIGHT = display_info.current_w, display_info.current_h
+FULL_W, FULL_H = display_info.current_w, display_info.current_h
+# SCREEN_WIDTH, SCREEN_HEIGHT = FULL_W, FULL_H
 SCREEN_WIDTH, SCREEN_HEIGHT = 900, 900
 gamestate = "Menu"
 running = True
@@ -46,26 +47,10 @@ windowone = pygame.window.Window(title="Minesweeper", fullscreen_desktop=False, 
 windowone.set_icon(icon)
 screen = windowone.get_surface()
 
-black_fading = pygame.Surface((SCREEN_WIDTH, SCREEN_HEIGHT))
+black_fading = pygame.Surface((FULL_W, FULL_H))
 black_fading.fill(BLACK)
 
 # =============== BUTTONS, TEXT, & IMAGES =============== #
-# == Menu
-header_text = UI.Text("Minesweeper", 60, "center", "center", WHITE, screen)
-start_button = UI.Button("center", 750, 100, 50, "Start", "Start", 20, WHITE, screen, BLACK, False)
-outline_start_button = UI.Button("center", 750, 110, 60, "", "", 0, WHITE, screen, WHITE, False)
-settings_button = UI.Button("center", 825, 100, 50, "Settings", "Settings", 20, WHITE, screen, BLACK, False)
-outline_settings_button = UI.Button("center", 825, 110, 60, "", "", 0, WHITE, screen, WHITE, False)
-back_button = UI.Button(35, 20, 75, 50, "\N{LEFTWARDS ARROW} Back", "\N{LEFTWARDS ARROW} Back", 20, WHITE, screen, BLACK, False)
-quit_button = UI.Button("center", 900, 100, 50, "Quit", "Quit", 20, WHITE, screen, BLACK, False)
-outline_quit_button = UI.Button("center", 900, 110, 60, "", "", 0, WHITE, screen, WHITE, False)
-
-# == Settings
-settings_header = UI.Text("~ Video & Audio ~", 25, 250, 160, WHITE, screen)
-fullscreen_text = UI.Text("Fullscreen?", 23, 100, 200, WHITE, screen)
-
-buttons = [start_button, settings_button, back_button, quit_button]
-
 tile_sheet_image = loadimg("assets", "tile_sheet.png")
 number_sheet_image = loadimg("assets", "number_sheet.png")
 face_sheet_image = loadimg("assets", "face_sheet.png")
@@ -74,19 +59,90 @@ tile_sheet = minesweeper.SpriteSheet(tile_sheet_image)
 number_sheet = minesweeper.SpriteSheet(number_sheet_image)
 face_sheet = minesweeper.SpriteSheet(face_sheet_image)
 
+# == Menu
+def Menu():
+    global header_text, start_button, outline_start_button, settings_button, outline_settings_button, back_button, quit_button, outline_quit_button, buttons, credits
+    header_text = UI.Text("Minesweeper", 60, "center", "center", WHITE, screen)
+    start_button = UI.Button("center", 600, 100, 50, "Start", "Start", 20, WHITE, screen, BLACK, False)
+    outline_start_button = UI.Button("center", 600, 110, 60, "", "", 0, WHITE, screen, WHITE, False)
+    settings_button = UI.Button("center", 675, 100, 50, "Settings", "Settings", 20, WHITE, screen, BLACK, False)
+    outline_settings_button = UI.Button("center", 675, 110, 60, "", "", 0, WHITE, screen, WHITE, False)
+    back_button = UI.Button(35, 20, 75, 50, "\N{LEFTWARDS ARROW} Back", "\N{LEFTWARDS ARROW} Back", 20, WHITE, screen, BLACK, False)
+    quit_button = UI.Button("center", 750, 100, 50, "Quit", "Quit", 20, WHITE, screen, BLACK, False)
+    outline_quit_button = UI.Button("center", 750, 110, 60, "", "", 0, WHITE, screen, WHITE, False)
+    credits = UI.Button((SCREEN_WIDTH - 48), (SCREEN_HEIGHT - 23), 100, 50, "made by /jm\\", "made by /jm\\", 15, WHITE, screen, BLACK, False)
+
+    buttons = [start_button, settings_button, back_button, quit_button]
+
+# == Settings
+settings_header = UI.Text("~ Video & Audio ~", 23, 125, 160, WHITE, screen)
+fullscreen_text = UI.Text("Fullscreen?", 20, 75, 210, WHITE, screen)
+
+
+
+
+try: # if have opened prior
+    with open("preferences.txt") as f:
+        pass
+
+    with open("preferences.txt", "a") as f:
+        print("loaded previous thing")
+    
+except FileNotFoundError:
+    with open("preferences.txt", "w") as f:
+        f.write("***** - PLAYER PREFERENCES - *****")
+
+
+
+
+
+
+
+# with open("user\\config.txt") as f:
+#     contents = f.read()
+
+#     if username in contents: # FINDING STRINGS WITHIN FILE
+#         print(f"found {username}")
+#     else:
+#         print(f"did not find ")
+
+
+# configtxt = open("user\\test.txt", "x") # ADDING NEW TXT FILES
+# os.remove("user\\test.txt") # REMOVING TXT FILES
+
+
+
+
+
+
+
+
+fullscreen_checkbox = UI.Checkbox("Fullscreen", 150, 190, 16, (minesweeper.tile_scale - 0.5), tile_sheet, False)
+checkboxes = [fullscreen_checkbox]
+
 face = minesweeper.Face(face_sheet, SCREEN_WIDTH, SCREEN_HEIGHT, False)
 
 timer_num_img, timer_num_local = minesweeper.minesweeper_timer(number_sheet, SCREEN_WIDTH, SCREEN_HEIGHT)
 mine_num_img, mine_num_local = minesweeper.remaining_mines(number_sheet, SCREEN_WIDTH, SCREEN_HEIGHT)
-
-credits = UI.Button((SCREEN_WIDTH - 48), (SCREEN_HEIGHT - 23), 100, 50, "made by /jm\\", "made by /jm\\", 15, WHITE, screen, BLACK, False)
-
 
 # =============== RUNNING =============== #
 while running:
     screen.fill(GRAY)
     mouse_pos = pygame.mouse.get_pos()
     clickable_mouse = False
+
+    # =============== SETTINGS LOGIC =============== #
+    for checkbox in checkboxes:
+        match checkbox.name:
+            case "Fullscreen":
+                if checkbox.toggle:
+                    SCREEN_WIDTH, SCREEN_HEIGHT = FULL_W, FULL_H
+                    windowone.set_fullscreen()
+                elif not checkbox.toggle:
+                    SCREEN_WIDTH = SCREEN_HEIGHT = 900
+                    windowone.set_windowed()
+
+                Menu()
 
     # =============== GAMESTATE =============== #
     match gamestate:
@@ -130,6 +186,7 @@ while running:
 
             drawblit(fullscreen_text.text, fullscreen_text.location)
             drawblit(settings_header.text, settings_header.location)
+            drawblit(fullscreen_checkbox.image, fullscreen_checkbox.location)
 
         case "Quitting":
             if fading_value < 255:
@@ -167,6 +224,19 @@ while running:
                 clickable_mouse = True
             else:
                 button.text = UI.fontrendering(button.base_text, 20, WHITE)
+
+        for checkbox in checkboxes:
+            if gamestate == "Settings" and checkbox.interactable:
+                if MOUSEDOWN and ev.button == 1 and checkbox.rect.collidepoint(mouse_pos):
+                    if not checkbox.toggle:
+                        checkbox.image = tile_sheet.get_image(17, 16, 16, (minesweeper.tile_scale - 0.5))
+                        checkbox.toggle = True
+                    else:
+                        checkbox.image = tile_sheet.get_image(16, 16, 16, (minesweeper.tile_scale - 0.5))
+                        checkbox.toggle = False
+
+                elif checkbox.rect.collidepoint(mouse_pos):
+                    clickable_mouse = True
 
         # =============== TILE LOGIC =============== #
         if not end_game or win:
@@ -284,7 +354,6 @@ while running:
                 if quit_button.rect.collidepoint(mouse_pos) and quit_button.interactable and gamestate == "Menu": # quitting
                     start_button.interactable = settings_button.interactable = quit_button.interactable = False
                     gamestate = "Quitting"
-
 
 
     drawblit(black_fading, (0, 0))

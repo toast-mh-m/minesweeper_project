@@ -50,8 +50,11 @@ class Text:
             self.location = self.text.get_rect(center=(x, y))
 
 class Checkbox:
-   def __init__(self, x, y, image):
-      self.x = x
+   def __init__(self, name, x, y, frame, scale, sheet, toggle):
+      self.name, self.location, self.interactable = name, (x, y), True
+      self.rect = pygame.Rect((x, y, 16 * scale, 16 * scale))
+      self.image = sheet.get_image(frame, 16, 16, scale)
+      self.toggle = toggle
 
 def fontrendering(text, font_size, color):
   font = pygame.font.SysFont("Times New Roman", font_size)
