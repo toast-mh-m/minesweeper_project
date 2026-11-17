@@ -28,6 +28,7 @@ settings:
 - * this will then activate a one-time thing that turns that selected thing into reality
 
 what i want in the settings:
+make it so you have to confirm settings!
 ### --- video & audio --- ###
 [x] fullscreen? (y/n) [auto on yes]
 [ ] aspect ratio (selection of presets) [only available on no fullscreen, just grayed out]

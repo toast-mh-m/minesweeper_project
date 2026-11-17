@@ -3,6 +3,7 @@ import os
 import UI
 import minesweeper
 import configurating
+from settings import *
 
 pygame.display.init()
 pygame.font.init()
@@ -13,70 +14,30 @@ tick_sfx = pygame.mixer.Sound(os.path.join("audio", "tick.mp3"))
 explode_sfx.set_volume(0.25)
 tick_sfx.set_volume(0.1)
 
-display_info = pygame.display.Info()
-
-# =============== FUNCTIONS =============== #
-def drawrect(color, rect):
-    return pygame.draw.rect(screen, color, rect, 0)
-
-def loadimg(folder, image):
-    return pygame.image.load(os.path.join(folder, image)).convert_alpha()
-
-def drawblit(text, location):
-    return screen.blit(text, location)
-
-# =============== VARIABLES REGARDING EVERYTHING =============== #
-FULL_W, FULL_H = display_info.current_w, display_info.current_h
-# SCREEN_WIDTH, SCREEN_HEIGHT = FULL_W, FULL_H
-SCREEN_WIDTH, SCREEN_HEIGHT = 900, 900
-gamestate = "Menu"
-running = True
-end_game = win = timer_active = False
-
-fading_value = 255
-fading_time = 5
-
-WHITE = (255, 255, 255)
-BLACK = (0, 0, 0)
-GRAY = (50, 50, 50)
-
-# =============== WINDOW =============== #
-icon = pygame.image.load(os.path.join("assets", "icon.png"))
-# windowone = pygame.window.Window(title="Minesweeper", fullscreen_desktop=True)
-windowone = pygame.window.Window(title="Minesweeper", fullscreen_desktop=False, size=(SCREEN_WIDTH, SCREEN_HEIGHT))
-windowone.set_icon(icon)
-screen = windowone.get_surface()
-
-black_fading = pygame.Surface((FULL_W, FULL_H))
-black_fading.fill(BLACK)
-
-# =============== BUTTONS, TEXT, & IMAGES =============== #
-tile_sheet_image = loadimg("assets", "tile_sheet.png")
-number_sheet_image = loadimg("assets", "number_sheet.png")
-face_sheet_image = loadimg("assets", "face_sheet.png")
-
-tile_sheet = minesweeper.SpriteSheet(tile_sheet_image)
-number_sheet = minesweeper.SpriteSheet(number_sheet_image)
-face_sheet = minesweeper.SpriteSheet(face_sheet_image)
 
 # == Menu
 def Menu():
     global header_text, start_button, outline_start_button, settings_button, outline_settings_button, back_button, quit_button, outline_quit_button, buttons, credits
-    header_text = UI.Text("Minesweeper", 60, "center", "center", WHITE, screen)
-    start_button = UI.Button("center", 600, 100, 50, "Start", "Start", 20, WHITE, screen, BLACK, False)
-    outline_start_button = UI.Button("center", 600, 110, 60, "", "", 0, WHITE, screen, WHITE, False)
-    settings_button = UI.Button("center", 675, 100, 50, "Settings", "Settings", 20, WHITE, screen, BLACK, False)
-    outline_settings_button = UI.Button("center", 675, 110, 60, "", "", 0, WHITE, screen, WHITE, False)
-    back_button = UI.Button(35, 20, 75, 50, "\N{LEFTWARDS ARROW} Back", "\N{LEFTWARDS ARROW} Back", 20, WHITE, screen, BLACK, False)
-    quit_button = UI.Button("center", 750, 100, 50, "Quit", "Quit", 20, WHITE, screen, BLACK, False)
-    outline_quit_button = UI.Button("center", 750, 110, 60, "", "", 0, WHITE, screen, WHITE, False)
-    credits = UI.Button((SCREEN_WIDTH - 48), (SCREEN_HEIGHT - 23), 100, 50, "made by /jm\\", "made by /jm\\", 15, WHITE, screen, BLACK, False)
+    header_text = UI.Text(text="Minesweeper", font_size=60, x=initiate_center, y=initiate_center, color=WHITE)
+    credits = UI.Text("made by /jm\\", 15, SCREEN_WIDTH, SCREEN_HEIGHT, WHITE)
+
+    outline_start_button = UI.OUTLINEBUTTON(None, 75, 110, 60, WHITE)
+    outline_settings_button = UI.OUTLINEBUTTON(None, 150, 110, 60, WHITE)
+    outline_quit_button = UI.OUTLINEBUTTON(None, 225, 110, 60, WHITE)
+
+    start_button = UI.Button(x=None, y=80, width=100, height=50, text="Start", font_size=20, font_color=WHITE, bgcolor=BLACK, interactable=False)
+    settings_button = UI.Button(None, 155, 100, 50, "Settings", 20, WHITE, BLACK, False)
+    quit_button = UI.Button(None, 230, 100, 50, "Quit", 20, WHITE, BLACK, False)
+    back_button = UI.Button(35, 20, 75, 50, "\N{LEFTWARDS ARROW} Back", 20, WHITE, BLACK, False)
 
     buttons = [start_button, settings_button, back_button, quit_button]
 
 # == Settings
-settings_header = UI.Text("~ Video & Audio ~", 23, 125, 160, WHITE, screen)
-fullscreen_text = UI.Text("Fullscreen?", 20, 75, 210, WHITE, screen)
+settings_header = UI.Text(text="~ Video & Audio ~", font_size=23, x=90, y=160, color=WHITE)
+fullscreen_text = UI.Text("Fullscreen?", 20, 75, 200, WHITE)
+
+fullscreen_checkbox = UI.Checkbox(name="Fullscreen", x=200, y=190, frame=16, scale=(minesweeper.tile_scale - 0.5), toggle=False)
+checkboxes = [fullscreen_checkbox]
 
 
 
@@ -113,13 +74,6 @@ except FileNotFoundError:
 
 
 
-
-
-
-
-fullscreen_checkbox = UI.Checkbox("Fullscreen", 150, 190, 16, (minesweeper.tile_scale - 0.5), tile_sheet, False)
-checkboxes = [fullscreen_checkbox]
-
 face = minesweeper.Face(face_sheet, SCREEN_WIDTH, SCREEN_HEIGHT, False)
 
 timer_num_img, timer_num_local = minesweeper.minesweeper_timer(number_sheet, SCREEN_WIDTH, SCREEN_HEIGHT)
@@ -137,21 +91,23 @@ while running:
             case "Fullscreen":
                 if checkbox.toggle:
                     SCREEN_WIDTH, SCREEN_HEIGHT = FULL_W, FULL_H
-                    windowone.set_fullscreen()
+                    windowone.set_fullscreen(True)
                 elif not checkbox.toggle:
                     SCREEN_WIDTH = SCREEN_HEIGHT = 900
                     windowone.set_windowed()
+
+                windowone.size = (SCREEN_WIDTH, SCREEN_HEIGHT)
 
                 Menu()
 
     # =============== GAMESTATE =============== #
     match gamestate:
         case "Menu": # =============== MENU SCREEN =============== #
-            for button in [outline_start_button, start_button, outline_settings_button, settings_button, credits, outline_quit_button, quit_button]:
-                drawrect(button.color, button.rect)
+            for button in [outline_start_button, outline_settings_button, outline_quit_button, start_button, settings_button, quit_button]:
+                drawrect(button.bgcolor, button.rect)
 
-            for text in [header_text, start_button, settings_button, credits, quit_button]:
-                drawblit(text.text, text.location)
+            for text in [header_text, credits, start_button, settings_button, quit_button]:
+                drawblit(text.text, text.textlocation)
 
             if fading_value >= 0:
                 fading_value -= fading_time
@@ -172,7 +128,7 @@ while running:
 
 
             drawrect(BLACK, face.rect)
-            drawrect(back_button.color, back_button.rect)
+            drawrect(back_button.bgcolor, back_button.rect)
             drawblit(back_button.text, back_button.location)
             drawblit(face.img, (face.x, face.y))
             back_button.interactable = True
@@ -181,11 +137,11 @@ while running:
 
         case "Settings": # =============== SETTINGS SCREEN =============== #
             back_button.interactable = True
-            drawrect(back_button.color, back_button.rect)
+            drawrect(back_button.bgcolor, back_button.rect)
             drawblit(back_button.text, back_button.location)
 
-            drawblit(fullscreen_text.text, fullscreen_text.location)
-            drawblit(settings_header.text, settings_header.location)
+            drawblit(fullscreen_text.text, fullscreen_text.textlocation)
+            drawblit(settings_header.text, settings_header.textlocation)
             drawblit(fullscreen_checkbox.image, fullscreen_checkbox.location)
 
         case "Quitting":

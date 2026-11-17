@@ -1,59 +1,65 @@
 import pygame
+from settings import initiate_center, screen, tile_sheet
 
 pygame.display.init()
 pygame.font.init()
 
 class Button:
-   def __init__(self, x, y, width, height, base_text, text, font_size, font_color, screen, color, interactable):
-      self.x, self.y, self.width, self.height, self.font_color, self.base_text, self.color, self.interactable = x, y, width, height, font_color, base_text, color, interactable
+   def __init__(self, x, y, width, height, text, font_size, font_color, bgcolor, interactable):
+      self.width, self.height, self.font_color, self.base_text, self.bgcolor, self.interactable = width, height, font_color, text, bgcolor, interactable
       font = pygame.font.SysFont("Times New Roman", font_size)
       self.text = font.render(text, True, font_color)
-      screen_w, screen_h = screen.get_size()
-      self.rect = pygame.Rect((0, 0, width, height))
 
-      match (x, y):
-         case "center", int() as y_value:
-            target_center = (screen_w // 2, y_value)
+      centerpos = screen.get_rect().center
+      centerx, centery = centerpos
+      if x == y == None:
+         location = self.rect.get_rect(center=(centerx, centery))
+      elif isinstance(x, int) and y == None:
+         location = (x, centery)
+      elif x == None and isinstance(y, int):
+         location = (centerx - 45, centery + y)
+      else:
+         location = (x, y)
 
-         case int() as x_value, "center":
-            target_center = (x_value, screen_h // 2)
+      localx, localy = location
+      self.location = location
+      self.rect = pygame.Rect((localx, localy, width, height))
+      self.textlocation = self.text.get_rect(center=self.rect.center)
 
-         case "center", "center":
-            target_center = (screen_w // 2, screen_h // 2)
+class OUTLINEBUTTON:
+   def __init__(self, x, y, width, height, bgcolor):
+      self.bgcolor = bgcolor
 
-         case int() as x_value, int() as y_value:
-            target_center = (x_value, y_value)
+      centerpos = screen.get_rect().center
+      centerx, centery = centerpos
+      if x == y == None:
+         location = self.rect.get_rect(center=(centerx, centery))
+      elif isinstance(x, int) and y == None:
+         location = (x, centery)
+      elif x == None and isinstance(y, int):
+         location = (centerx - 50, centery + y)
+      else:
+         location = (x, y)
 
-         case _:
-            target_center = (x, y)
-            
-      self.rect.center = target_center
-      self.location = self.text.get_rect(center=target_center)
+      localx, localy = location
+      self.rect = pygame.Rect((localx, localy, width, height))
 
 class Text:
-   def __init__(self, text, font_size, x, y, color, screen):
+   def __init__(self, text, font_size, x, y, color):
       font = pygame.font.SysFont("Times New Roman", font_size)
       self.text = font.render(text, True, color)
-      self.x, self.y = x, y
-      tl, tr = screen.get_size()
-      match (x, y):
-         case "center", int() as y:
-            self.location = self.text.get_rect(center=(tl // 2, y))
-
-         case int() as x, "center":
-            self.location = self.text.get_rect(center=(x, tr // 2))
-
-         case "center", "center":
-            self.location = self.text.get_rect(center=(tl // 2, tr // 2))
-
-         case int() as x, int() as y:
-            self.location = self.text.get_rect(center=(x, y))
+      if x == y == initiate_center:
+         centerpos = screen.get_rect().center
+         centerx, centery = centerpos
+         self.textlocation = self.text.get_rect(center=(centerx, centery))
+      else:
+         self.textlocation = (x, y)
 
 class Checkbox:
-   def __init__(self, name, x, y, frame, scale, sheet, toggle):
+   def __init__(self, name, x, y, frame, scale, toggle):
       self.name, self.location, self.interactable = name, (x, y), True
       self.rect = pygame.Rect((x, y, 16 * scale, 16 * scale))
-      self.image = sheet.get_image(frame, 16, 16, scale)
+      self.image = tile_sheet.get_image(frame, 16, 16, scale)
       self.toggle = toggle
 
 def fontrendering(text, font_size, color):
