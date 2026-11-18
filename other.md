@@ -32,6 +32,17 @@ make it so you have to confirm settings!
 ### --- video & audio --- ###
 [x] fullscreen? (y/n) [auto on yes]
 [ ] aspect ratio (selection of presets) [only available on no fullscreen, just grayed out]
+800x600
+1024x768
+1280x720
+1280x800
+1440x900
+1600x1200
+1680x1050
+1920x1080
+2560x1440
+2560x1600
+
 [ ] sound slider
 
 ### --- gameplay --- ###

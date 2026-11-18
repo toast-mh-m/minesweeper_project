@@ -1,6 +1,4 @@
-import pygame
-import math
-import configurating
+import pygame, math, configurating
 
 pygame.display.init()
 pygame.font.init()

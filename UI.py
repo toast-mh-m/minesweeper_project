@@ -1,5 +1,6 @@
 import pygame
 from settings import initiate_center, screen, tile_sheet
+from minesweeper import SpriteSheet
 
 pygame.display.init()
 pygame.font.init()
@@ -48,6 +49,7 @@ class Text:
    def __init__(self, text, font_size, x, y, color):
       font = pygame.font.SysFont("Times New Roman", font_size)
       self.text = font.render(text, True, color)
+      self.y = y
       if x == y == initiate_center:
          centerpos = screen.get_rect().center
          centerx, centery = centerpos
@@ -57,10 +59,19 @@ class Text:
 
 class Checkbox:
    def __init__(self, name, x, y, frame, scale, toggle):
-      self.name, self.location, self.interactable = name, (x, y), True
+      self.name, self.location, self.interactable = name, (x, y), False
       self.rect = pygame.Rect((x, y, 16 * scale, 16 * scale))
       self.image = tile_sheet.get_image(frame, 16, 16, scale)
       self.toggle = toggle
+
+class DropDown:
+   def __init__(self, name, x, y, list):
+      self.name, self.location, self.interactable, self.list = name, (x, y), False, list
+      self.rect = pygame.Rect((x, y, 100, 50))
+
+class ArrowTile:
+   def __init__(self, x, y, width, height):
+      pass
 
 def fontrendering(text, font_size, color):
   font = pygame.font.SysFont("Times New Roman", font_size)

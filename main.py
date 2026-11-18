@@ -1,8 +1,5 @@
-import pygame
-import os
-import UI
-import minesweeper
-import configurating
+import pygame, os
+import UI, minesweeper, configurating
 from settings import *
 
 pygame.display.init()
@@ -18,9 +15,14 @@ tick_sfx.set_volume(0.1)
 # == Menu
 def Menu():
     global header_text, start_button, outline_start_button, settings_button, outline_settings_button, back_button, quit_button, outline_quit_button, buttons, credits
-    header_text = UI.Text(text="Minesweeper", font_size=60, x=initiate_center, y=initiate_center, color=WHITE)
-    credits = UI.Text("made by /jm\\", 15, SCREEN_WIDTH, SCREEN_HEIGHT, WHITE)
-
+    header_text = UI.Text(text="Test", font_size=60, x=initiate_center, y=initiate_center, color=WHITE)
+    difference = 0
+    if SCREEN_WIDTH == FULL_W:
+        difference = 75
+    else:
+        difference = 30
+    
+    credits = UI.Text("made by /jm\\", 15, 10, SCREEN_HEIGHT - difference, WHITE)
     outline_start_button = UI.OUTLINEBUTTON(None, 75, 110, 60, WHITE)
     outline_settings_button = UI.OUTLINEBUTTON(None, 150, 110, 60, WHITE)
     outline_quit_button = UI.OUTLINEBUTTON(None, 225, 110, 60, WHITE)
@@ -33,25 +35,58 @@ def Menu():
     buttons = [start_button, settings_button, back_button, quit_button]
 
 # == Settings
-settings_header = UI.Text(text="~ Video & Audio ~", font_size=23, x=90, y=160, color=WHITE)
-fullscreen_text = UI.Text("Fullscreen?", 20, 75, 200, WHITE)
+fullscreen_checkbox = aspectratio_checkbox = None
 
-fullscreen_checkbox = UI.Checkbox(name="Fullscreen", x=200, y=190, frame=16, scale=(minesweeper.tile_scale - 0.5), toggle=False)
-checkboxes = [fullscreen_checkbox]
+def Settings(which_checkbox, boolean, frame):
+    global checkboxes, settings_header, fullscreen_text, fullscreen_checkbox, aspectratio_text, aspectratio_checkbox
+    settings_header = UI.Text(text="~ Video & Audio ~", font_size=23, x=90, y=160, color=WHITE)
+    fullscreen_text = UI.Text("Fullscreen?", 20, 75, 200, WHITE)
+    aspectratio_text = UI.Text("Aspect Ratio:", 20, 75, 275, WHITE)
+    # ar_leftbutton = UI.Button(x=200, y=190, width=16, height=16, text="")
+
+    scale = (minesweeper.tile_scale - 0.5)
+    match which_checkbox:
+        case "Fullscreen":
+            fullscreen_checkbox = UI.Checkbox(name="Fullscreen", x=200, y=190, frame=frame, scale=scale, toggle=boolean)
+        case "AspectRatio":
+            aspectratio_checkbox = UI.DropDown(name="AspectRatio", x=250, y=265, list=frame)
+        case _:
+            pass
+
+    checkboxes = [fullscreen_checkbox, aspectratio_checkbox]
 
 
-
-
+preference_data = None
 try: # if have opened prior
-    with open("preferences.txt") as f:
+    if os.path.isfile("preferences.txt"):
         pass
 
-    with open("preferences.txt", "a") as f:
-        print("loaded previous thing")
+    with open("preferences.txt", "r") as f:
+        preference_data = f.readlines()
+
+    # == fullscreen
+    frame = 17 if eval(preference_data[1][12:]) else 16
+    Settings("Fullscreen", eval(preference_data[1][12:]), frame)
+    # == aspect ratio
+    list = [""]
+    Settings("AspectRatio", None, list)
+
     
 except FileNotFoundError:
     with open("preferences.txt", "w") as f:
         f.write("***** - PLAYER PREFERENCES - *****")
+        f.write("\nFullscreen: False")
+        f.write("\nAspectRatio: 800x600")
+
+    with open("preferences.txt", "r") as f:
+        preference_data = f.readlines()
+
+    # == fullscreen
+    frame = 17 if eval(preference_data[1][12:]) else 16
+    Settings("Fullscreen", False, frame)
+    # == aspect ratio
+    list = [""]
+    Settings("AspectRatio", None, list)
 
 
 
@@ -89,16 +124,36 @@ while running:
     for checkbox in checkboxes:
         match checkbox.name:
             case "Fullscreen":
+                end_result = frame = None
                 if checkbox.toggle:
                     SCREEN_WIDTH, SCREEN_HEIGHT = FULL_W, FULL_H
                     windowone.set_fullscreen(True)
+                    end_result = True
+                    frame = 17
                 elif not checkbox.toggle:
                     SCREEN_WIDTH = SCREEN_HEIGHT = 900
                     windowone.set_windowed()
+                    end_result = False
+                    frame = 16
 
                 windowone.size = (SCREEN_WIDTH, SCREEN_HEIGHT)
 
-                Menu()
+                with open("preferences.txt", "a") as f:
+                    if end_result:
+                        preference_data[1] = "Fullscreen: True\n"
+                    else:
+                        preference_data[1] = "Fullscreen: False\n"
+
+                with open("preferences.txt", "w") as f:
+                    f.writelines(preference_data)
+
+                Settings("Fullscreen", end_result, frame)
+            case "AspectRatio":
+                end_result = frame = None
+                pass
+
+
+    Menu()
 
     # =============== GAMESTATE =============== #
     match gamestate:
@@ -108,6 +163,9 @@ while running:
 
             for text in [header_text, credits, start_button, settings_button, quit_button]:
                 drawblit(text.text, text.textlocation)
+
+            for checkbox in checkboxes:
+                checkbox.interactable = False
 
             if fading_value >= 0:
                 fading_value -= fading_time
@@ -137,11 +195,15 @@ while running:
 
         case "Settings": # =============== SETTINGS SCREEN =============== #
             back_button.interactable = True
+
+            for checkbox in checkboxes:
+                checkbox.interactable = True
             drawrect(back_button.bgcolor, back_button.rect)
             drawblit(back_button.text, back_button.location)
 
-            drawblit(fullscreen_text.text, fullscreen_text.textlocation)
-            drawblit(settings_header.text, settings_header.textlocation)
+            for thing in [fullscreen_text, settings_header, aspectratio_text]:
+                drawblit(thing.text, thing.textlocation)
+                
             drawblit(fullscreen_checkbox.image, fullscreen_checkbox.location)
 
         case "Quitting":
@@ -183,13 +245,14 @@ while running:
 
         for checkbox in checkboxes:
             if gamestate == "Settings" and checkbox.interactable:
-                if MOUSEDOWN and ev.button == 1 and checkbox.rect.collidepoint(mouse_pos):
-                    if not checkbox.toggle:
-                        checkbox.image = tile_sheet.get_image(17, 16, 16, (minesweeper.tile_scale - 0.5))
-                        checkbox.toggle = True
-                    else:
-                        checkbox.image = tile_sheet.get_image(16, 16, 16, (minesweeper.tile_scale - 0.5))
-                        checkbox.toggle = False
+                if MOUSEDOWN:
+                    if ev.button == 1 and checkbox.rect.collidepoint(mouse_pos):
+                        if not checkbox.toggle:
+                            checkbox.image = tile_sheet.get_image(17, 16, 16, (minesweeper.tile_scale - 0.5))
+                            checkbox.toggle = True
+                        elif checkbox.toggle:
+                            checkbox.image = tile_sheet.get_image(16, 16, 16, (minesweeper.tile_scale - 0.5))
+                            checkbox.toggle = False
 
                 elif checkbox.rect.collidepoint(mouse_pos):
                     clickable_mouse = True
