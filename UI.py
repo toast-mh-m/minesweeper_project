@@ -1,6 +1,6 @@
 import pygame
 from settings import initiate_center, screen, tile_sheet
-from minesweeper import SpriteSheet
+from minesweeper import tile_scale
 
 pygame.display.init()
 pygame.font.init()
@@ -70,8 +70,16 @@ class DropDown:
       self.rect = pygame.Rect((x, y, 100, 50))
 
 class ArrowTile:
-   def __init__(self, x, y, width, height):
-      pass
+   def __init__(self, x, y, scale, direction):
+      self.interactable = True
+      self.rect = pygame.Rect((x, y, 16 * scale, 16 * scale))
+      self.location = (x, y)
+      if direction == "Left":
+         self.image = tile_sheet.get_image(18, 16, 16, scale)
+         self.pressed = tile_sheet.get_image(20, 16, 16, scale)
+      elif direction == "Right":
+         self.image = tile_sheet.get_image(19, 16, 16, scale)
+         self.pressed = tile_sheet.get_image(21, 16, 16, scale)
 
 def fontrendering(text, font_size, color):
   font = pygame.font.SysFont("Times New Roman", font_size)

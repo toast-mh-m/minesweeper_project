@@ -35,25 +35,24 @@ def Menu():
     buttons = [start_button, settings_button, back_button, quit_button]
 
 # == Settings
-fullscreen_checkbox = aspectratio_checkbox = None
+fullscreen_checkbox = None
 
 def Settings(which_checkbox, boolean, frame):
-    global checkboxes, settings_header, fullscreen_text, fullscreen_checkbox, aspectratio_text, aspectratio_checkbox
+    global checkboxes, settings_header, fullscreen_text, fullscreen_checkbox, aspectratio_text, aspectratio_left_button, aspectratio_right_button
+    scale = (minesweeper.tile_scale - 0.5)
     settings_header = UI.Text(text="~ Video & Audio ~", font_size=23, x=90, y=160, color=WHITE)
     fullscreen_text = UI.Text("Fullscreen?", 20, 75, 200, WHITE)
     aspectratio_text = UI.Text("Aspect Ratio:", 20, 75, 275, WHITE)
-    # ar_leftbutton = UI.Button(x=200, y=190, width=16, height=16, text="")
+    aspectratio_left_button = UI.ArrowTile(x=250, y=275, scale=scale / 1.5, direction="Left")
+    # aspectratio_right_button = UI.ArrowTile(x=250, y=365, direction="Right")
 
-    scale = (minesweeper.tile_scale - 0.5)
     match which_checkbox:
         case "Fullscreen":
             fullscreen_checkbox = UI.Checkbox(name="Fullscreen", x=200, y=190, frame=frame, scale=scale, toggle=boolean)
-        case "AspectRatio":
-            aspectratio_checkbox = UI.DropDown(name="AspectRatio", x=250, y=265, list=frame)
         case _:
             pass
 
-    checkboxes = [fullscreen_checkbox, aspectratio_checkbox]
+    checkboxes = [fullscreen_checkbox]
 
 
 preference_data = None
@@ -198,13 +197,14 @@ while running:
 
             for checkbox in checkboxes:
                 checkbox.interactable = True
-            drawrect(back_button.bgcolor, back_button.rect)
-            drawblit(back_button.text, back_button.location)
 
-            for thing in [fullscreen_text, settings_header, aspectratio_text]:
+            drawrect(back_button.bgcolor, back_button.rect)
+
+            for thing in [fullscreen_text, settings_header, aspectratio_text, back_button]:
                 drawblit(thing.text, thing.textlocation)
                 
             drawblit(fullscreen_checkbox.image, fullscreen_checkbox.location)
+            drawblit(aspectratio_left_button.image, aspectratio_left_button.location)
 
         case "Quitting":
             if fading_value < 255:
